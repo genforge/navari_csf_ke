@@ -3,7 +3,9 @@ from . import __version__ as app_version
 app_name = "csf_ke"
 app_title = "Navari Country Specific Customizations for Kenya"
 app_publisher = "Navari Ltd"
-app_description = "ERPNext and FrappeHR Country Specific Customizations for Kenya by Navari Ltd"
+app_description = (
+    "ERPNext and FrappeHR Country Specific Customizations for Kenya by Navari Ltd"
+)
 app_icon = "drag"
 app_color = "grey"
 app_email = "info@navari.co.ke"
@@ -24,17 +26,12 @@ fixtures = [
                     "Employee-nssf_no",
                     "Employee-tax_id",
                     "Salary Component-p9a_tax_deduction_card_type",
-                   
                 ),
             ]
         ],
     },
-    {
-        "doctype": "Salary Component"
-    },
-    {
-        "doctype": "Salary Structure"
-    },
+    {"doctype": "Salary Component"},
+    {"doctype": "Salary Structure"},
 ]
 
 # Includes in <head>
@@ -131,6 +128,11 @@ fixtures = [
 # 	}
 # }
 
+doc_events = {
+    "Purchase Receipt": {
+        "on_submit": "csf_ke.csf_ke.doctype.api.update_item_price_list.update_item_prices"
+    }
+}
 # Scheduled Tasks
 # ---------------
 
@@ -205,4 +207,3 @@ user_data_fields = [
 # auth_hooks = [
 # 	"csf_ke.auth.validate"
 # ]
-

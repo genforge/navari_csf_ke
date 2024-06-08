@@ -1,0 +1,139 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2024-06-05 06:34:32.934576",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "duration_section",
+  "start_date",
+  "column_break_pnur",
+  "end_date",
+  "column_break_zujf",
+  "disabled",
+  "section_break_mayg",
+  "selling_price",
+  "margin_based_on",
+  "buying_price",
+  "section_break_ozli",
+  "margin_type",
+  "column_break_xxgj",
+  "margin_percentage_or_amount",
+  "section_break_hbod",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_hbod",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Selling Item Price Margin",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "duration_section",
+   "fieldtype": "Section Break",
+   "label": "Duration"
+  },
+  {
+   "fieldname": "start_date",
+   "fieldtype": "Date",
+   "label": "Start Date"
+  },
+  {
+   "fieldname": "column_break_pnur",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "end_date",
+   "fieldtype": "Date",
+   "label": "End Date"
+  },
+  {
+   "fieldname": "column_break_zujf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "allow_on_submit": 1,
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "section_break_mayg",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "selling_price",
+   "fieldtype": "Link",
+   "label": "Selling Price",
+   "options": "Price List"
+  },
+  {
+   "fieldname": "margin_based_on",
+   "fieldtype": "Select",
+   "label": "Margin Based On",
+   "options": "\nBuying Price\nValuation Rate"
+  },
+  {
+   "depends_on": "eval:doc.margin_based_on == \"Buying Price\"",
+   "fieldname": "buying_price",
+   "fieldtype": "Link",
+   "label": "Buying Price",
+   "options": "Price List"
+  },
+  {
+   "fieldname": "section_break_ozli",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "margin_type",
+   "fieldtype": "Select",
+   "label": "Margin Type",
+   "options": "\nAmount\nPercentage"
+  },
+  {
+   "fieldname": "margin_percentage_or_amount",
+   "fieldtype": "Currency",
+   "label": "Margin Percentage or Amount"
+  },
+  {
+   "fieldname": "column_break_xxgj",
+   "fieldtype": "Column Break"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2024-06-05 06:55:04.778844",
+ "modified_by": "Administrator",
+ "module": "CSF KE",
+ "name": "Selling Item Price Margin",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
