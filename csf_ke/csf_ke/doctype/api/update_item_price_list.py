@@ -69,6 +69,9 @@ def get_margin_details(price_list):
             {"selling_price": price_list},
             "margin_percentage_or_amount",
         ),
+        "warehouse": frappe.db.get_value(
+            "Selling Item Price Margin", {"selling_price": price_list}, "warehouse"
+        ),
     }
     return margin_details if all(margin_details.values()) else None
 
@@ -87,6 +90,7 @@ def calculate_new_rate(item_code, margin_details):
     margin_based_on = margin_details["margin_based_on"]
     margin_type = margin_details["margin_type"]
     margin_percentage_or_amount = margin_details["margin_percentage_or_amount"]
+    warehouse = margin_details["warehouse"]
     rate = 0
 
     if margin_based_on == "Buying Price":
@@ -98,7 +102,7 @@ def calculate_new_rate(item_code, margin_details):
     elif margin_based_on == "Valuation Rate":
         valuation_rate = get_valuation_rate(
             item_code,
-            warehouse="Stores - CKD",
+            warehouse=warehouse,
             with_valuation_rate=True,
             with_serial_no=False,
         )
@@ -139,6 +143,7 @@ def update_item_price(item_code, price_list, new_rate):
     batch_no = frappe.db.get_value("Item Price", item_price_name, "batch_no")
     valid_from = frappe.db.get_value("Item Price", item_price_name, "valid_from")
     valid_upto = frappe.db.get_value("Item Price", item_price_name, "valid_upto")
+    old_rate = frappe.db.get_value("Item Price", item_price_name, "price_list_rate")
 
     current_date = datetime.now().date()
 
@@ -156,6 +161,9 @@ def update_item_price(item_code, price_list, new_rate):
             valid_from = datetime.strptime(valid_from, "%Y-%m-%d").date()
         if valid_from > current_date:
             frappe.throw("Cannot update price before valid_from")
+
+    if new_rate <= old_rate:
+        return
 
     if item_price_name:
         try:
