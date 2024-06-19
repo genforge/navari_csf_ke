@@ -5,12 +5,20 @@ import time
 
 
 def update_item_prices(doc, method):
+    """
+    Main function triggered on a specific document event e.g., on_submit.
+    Params: `doc` and `method`
+    For each item in the document, retrieve the price list
+    If a price list exists, process it else create and process a new price list
+    """
     for item in doc.items:
         price_list = get_price_list(item.item_code)
         if price_list:
             process_existing_price_list(item, price_list)
+            frappe.msgprint("Hello There Document")
         else:
             create_and_process_new_price_list(item)
+            frappe.msgprint("Hello There Document")
 
 
 def get_price_list(item_code):
@@ -20,6 +28,13 @@ def get_price_list(item_code):
 
 
 def process_existing_price_list(item, price_list):
+    """
+    Update the item price based on predefined margin details
+    Params: `item` and `price_list`
+    Check if there are margin details for the price list
+    If margin details exist, calculate the new rate
+    Update the item price with the new rate
+    """
 
     if frappe.db.exists("Selling Item Price Margin", {"selling_price": price_list}):
         margin_details = get_margin_details(price_list)
@@ -29,6 +44,14 @@ def process_existing_price_list(item, price_list):
 
 
 def get_margin_details(price_list):
+    """
+    Get the margin details for the price list
+    Params: `price_list`
+    Check if there are margin details for the price list
+    If margin details exist, return the details
+    Else return None
+    """
+
     margin_details = {
         "margin_based_on": frappe.db.get_value(
             "Selling Item Price Margin",
@@ -48,6 +71,16 @@ def get_margin_details(price_list):
 
 
 def calculate_new_rate(item_code, margin_details):
+    """
+    Calculate the new rate based on the margin details
+    Params: `item_code` and `margin_details`
+    Check if the margin based on is buying price
+    If buying price, retrieve the buying price and apply the margin
+    Check if the margin based on is valuation rate
+    If valuation rate, retrieve the valuation rate and apply the margin
+    Return the new rate
+    """
+
     margin_based_on = margin_details["margin_based_on"]
     margin_type = margin_details["margin_type"]
     margin_percentage_or_amount = margin_details["margin_percentage_or_amount"]
@@ -82,11 +115,42 @@ def apply_margin(base_rate, margin_type, margin_value):
 
 
 def update_item_price(item_code, price_list, new_rate):
+    """
+    Update the item price with the new rate checking for batch number and valid dates
+    Params: `item_code`, `price_list` and `new_rate`
+    Retrieve the name of the item price
+    Check for batch number and valid dates
+    If batch number exists, throw an error
+    If `valid_upto` is in the past, throw an error
+    If `valid_from` is in the future, throw an error
+    If none of the conditions are met, update the item price with the new rate
+    """
+
     item_price_name = frappe.db.get_value(
         "Item Price",
         {"item_code": item_code, "price_list": price_list, "selling": 1},
         "name",
     )
+
+    # Check for batch number and valid dates
+    batch_no = frappe.db.get_value("Item Price", item_price_name, "batch_no")
+    valid_from = frappe.db.get_value("Item Price", item_price_name, "valid_from")
+    valid_upto = frappe.db.get_value("Item Price", item_price_name, "valid_upto")
+
+    current_date = frappe.utils.nowdate()
+
+    if batch_no:
+
+        frappe.throw("Cannot update batched price")
+
+    if valid_upto and valid_upto < current_date:
+
+        frappe.throw("Cannot update price after valid_upto")
+
+    if valid_from and valid_from > current_date:
+
+        frappe.throw("Cannot update price before valid_from")
+
     if item_price_name:
         try:
             frappe.db.set_value(
@@ -104,6 +168,15 @@ def update_item_price(item_code, price_list, new_rate):
 
 
 def create_and_process_new_price_list(item):
+    """
+    Create a new price list and process it
+    Params: `item`
+    Create a new Item Price document with the item details and desired price list.
+    Wait for 5 seconds before further processing.
+    Check if margin details exist for the new price list.
+    If margin details exist, calculate the new rate using calculate_new_rate.
+    Update the item price with the new rate using update_item_price.
+    """
     new_price_list_doc = frappe.get_doc(
         {
             "doctype": "Item Price",

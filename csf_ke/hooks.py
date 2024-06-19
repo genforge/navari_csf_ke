@@ -131,7 +131,10 @@ fixtures = [
 doc_events = {
     "Purchase Receipt": {
         "on_submit": "csf_ke.csf_ke.doctype.api.update_item_price_list.update_item_prices"
-    }
+    },
+    "Purchase Invoice": {
+        "on_submit": "csf_ke.csf_ke.doctype.api.update_item_price_list.update_item_prices"
+    },
 }
 # Scheduled Tasks
 # ---------------
