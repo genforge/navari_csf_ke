@@ -2,6 +2,7 @@ import frappe
 from frappe import _
 from erpnext.stock.utils import get_stock_balance
 import time
+from datetime import datetime, date
 
 
 def update_item_prices(doc, method):
@@ -11,14 +12,16 @@ def update_item_prices(doc, method):
     For each item in the document, retrieve the price list
     If a price list exists, process it else create and process a new price list
     """
+
+    if doc.doctype == "Purchase Invoice" and not doc.update_stock:
+        return
+
     for item in doc.items:
         price_list = get_price_list(item.item_code)
         if price_list:
             process_existing_price_list(item, price_list)
-            frappe.msgprint("Hello There Document")
         else:
             create_and_process_new_price_list(item)
-            frappe.msgprint("Hello There Document")
 
 
 def get_price_list(item_code):
@@ -137,19 +140,22 @@ def update_item_price(item_code, price_list, new_rate):
     valid_from = frappe.db.get_value("Item Price", item_price_name, "valid_from")
     valid_upto = frappe.db.get_value("Item Price", item_price_name, "valid_upto")
 
-    current_date = frappe.utils.nowdate()
+    current_date = datetime.now().date()
 
     if batch_no:
-
         frappe.throw("Cannot update batched price")
 
-    if valid_upto and valid_upto < current_date:
+    if valid_upto:
+        if isinstance(valid_upto, str):
+            valid_upto = datetime.strptime(valid_upto, "%Y-%m-%d").date()
+        if valid_upto < current_date:
+            frappe.throw("Cannot update price after valid_upto")
 
-        frappe.throw("Cannot update price after valid_upto")
-
-    if valid_from and valid_from > current_date:
-
-        frappe.throw("Cannot update price before valid_from")
+    if valid_from:
+        if isinstance(valid_from, str):
+            valid_from = datetime.strptime(valid_from, "%Y-%m-%d").date()
+        if valid_from > current_date:
+            frappe.throw("Cannot update price before valid_from")
 
     if item_price_name:
         try:
