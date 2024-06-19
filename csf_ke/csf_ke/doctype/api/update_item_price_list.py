@@ -148,19 +148,22 @@ def update_item_price(item_code, price_list, new_rate):
     current_date = datetime.now().date()
 
     if batch_no:
-        frappe.throw("Cannot update batched price")
+        frappe.log_error("Cannot update batched price")
+        return
 
     if valid_upto:
         if isinstance(valid_upto, str):
             valid_upto = datetime.strptime(valid_upto, "%Y-%m-%d").date()
         if valid_upto < current_date:
-            frappe.throw("Cannot update price after valid_upto")
+            frappe.log_error("Cannot update price after valid_upto")
+            return
 
     if valid_from:
         if isinstance(valid_from, str):
             valid_from = datetime.strptime(valid_from, "%Y-%m-%d").date()
         if valid_from > current_date:
-            frappe.throw("Cannot update price before valid_from")
+            frappe.log_error("Cannot update price before valid_from")
+            return
 
     if new_rate <= old_rate:
         return
@@ -173,12 +176,8 @@ def update_item_price(item_code, price_list, new_rate):
 
         except Exception as e:
             frappe.log_error(f"Error updating Item Price: {str(e)}")
-            frappe.throw(f"Error when updating Item Price: {e}")
     else:
         frappe.log_error(f"Error updating Item Price: {str(e)}")
-        frappe.throw(
-            f"Item Price not found for item {item_code} and price list {price_list}"
-        )
 
 
 def create_and_process_new_price_list(item):
@@ -241,6 +240,6 @@ def get_valuation_rate(
             # Return only the valuation rate
             return valuation_rate
         else:
-            frappe.throw("Valuation rate not found in stock balance")
+            frappe.log_error("Valuation rate not found in stock balance")
     else:
-        frappe.throw("Invalid stock balance format")
+        frappe.log_error("Invalid stock balance format")
