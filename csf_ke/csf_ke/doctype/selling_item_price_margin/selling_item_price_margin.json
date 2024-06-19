@@ -13,7 +13,9 @@
   "disabled",
   "section_break_mayg",
   "selling_price",
+  "price_margin_type_section",
   "margin_based_on",
+  "column_break_hckd",
   "buying_price",
   "section_break_ozli",
   "margin_type",
@@ -69,7 +71,8 @@
   },
   {
    "fieldname": "section_break_mayg",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Selling Price List"
   },
   {
    "fieldname": "selling_price",
@@ -92,7 +95,8 @@
   },
   {
    "fieldname": "section_break_ozli",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "Price Margin Value"
   },
   {
    "fieldname": "margin_type",
@@ -108,12 +112,21 @@
   {
    "fieldname": "column_break_xxgj",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "price_margin_type_section",
+   "fieldtype": "Section Break",
+   "label": "Price Margin Type"
+  },
+  {
+   "fieldname": "column_break_hckd",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-06-05 06:55:04.778844",
+ "modified": "2024-06-19 05:57:03.445796",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",

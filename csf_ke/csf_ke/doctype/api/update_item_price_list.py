@@ -20,9 +20,6 @@ def get_price_list(item_code):
 
 
 def process_existing_price_list(item, price_list):
-    frappe.msgprint(
-        f"Processing existing price list for Item {item.item_code}: {price_list}"
-    )
 
     if frappe.db.exists("Selling Item Price Margin", {"selling_price": price_list}):
         margin_details = get_margin_details(price_list)
@@ -74,9 +71,6 @@ def calculate_new_rate(item_code, margin_details):
                 valuation_rate, margin_type, margin_percentage_or_amount
             )
 
-    frappe.msgprint(
-        f"Calculated new rate for Item {item_code} based on {margin_based_on}: {rate}"
-    )
     return rate
 
 
@@ -98,15 +92,14 @@ def update_item_price(item_code, price_list, new_rate):
             frappe.db.set_value(
                 "Item Price", item_price_name, "price_list_rate", new_rate
             )
-            frappe.msgprint(
-                f"Rate updated successfully for {item_code} in price list {price_list}."
-            )
+
         except Exception as e:
             frappe.log_error(f"Error updating Item Price: {str(e)}")
             frappe.throw(f"Error when updating Item Price: {e}")
     else:
-        frappe.msgprint(
-            f"No price list entry found for item {item_code} in price list {price_list}."
+        frappe.log_error(f"Error updating Item Price: {str(e)}")
+        frappe.throw(
+            f"Item Price not found for item {item_code} and price list {price_list}"
         )
 
 
@@ -123,19 +116,14 @@ def create_and_process_new_price_list(item):
 
     new_price_list_doc.insert()
 
-    frappe.msgprint(
-        f"Created new Price List for Item {item.item_code}: {new_price_list_doc.name}"
-    )
     time.sleep(5)  # Wait for 5 seconds before processing
 
     if frappe.db.exists(
         "Selling Item Price Margin", {"selling_price": new_price_list_doc.price_list}
     ):
-        frappe.msgprint(f"Price list {new_price_list_doc.price_list} already exists")
         margin_details = get_margin_details(new_price_list_doc.price_list)
         if margin_details:
             new_rate = calculate_new_rate(item.item_code, margin_details)
-            frappe.msgprint(f"New item rate is {new_rate}")
             update_item_price(item.item_code, new_price_list_doc.price_list, new_rate)
 
 
@@ -164,7 +152,6 @@ def get_valuation_rate(
         valuation_rate = dictionary_data.get(1)
         if valuation_rate is not None:
             # Return only the valuation rate
-            frappe.msgprint(f"Valuation rate for item {item_code} is {valuation_rate}")
             return valuation_rate
         else:
             frappe.throw("Valuation rate not found in stock balance")
