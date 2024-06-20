@@ -15,6 +15,7 @@
   "selling_price",
   "column_break_lymo",
   "warehouse",
+  "item_uom",
   "price_margin_type_section",
   "margin_based_on",
   "column_break_hckd",
@@ -144,12 +145,18 @@
   {
    "fieldname": "column_break_lymo",
    "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "item_uom",
+   "fieldtype": "Link",
+   "label": "Item UOM",
+   "options": "UOM"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-06-19 11:00:54.395530",
+ "modified": "2024-06-20 08:46:45.046430",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",

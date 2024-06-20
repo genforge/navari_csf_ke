@@ -43,7 +43,7 @@ def process_existing_price_list(item, price_list):
         margin_details = get_margin_details(price_list)
         if margin_details:
             new_rate = calculate_new_rate(item.item_code, margin_details)
-            update_item_price(item.item_code, price_list, new_rate)
+            update_item_price(item.item_code, price_list, new_rate, item.uom)
 
 
 def get_margin_details(price_list):
@@ -72,6 +72,9 @@ def get_margin_details(price_list):
         "warehouse": frappe.db.get_value(
             "Selling Item Price Margin", {"selling_price": price_list}, "warehouse"
         ),
+        "uom": frappe.db.get_value(
+            "Selling Item Price Margin", {"selling_price": price_list}, "item_uom"
+        ),
     }
     return margin_details if all(margin_details.values()) else None
 
@@ -91,21 +94,26 @@ def calculate_new_rate(item_code, margin_details):
     margin_type = margin_details["margin_type"]
     margin_percentage_or_amount = margin_details["margin_percentage_or_amount"]
     warehouse = margin_details["warehouse"]
+    uom = margin_details["uom"]
     rate = 0
 
     if margin_based_on == "Buying Price":
-        buying_price = frappe.db.get_value(
-            "Item Price", {"item_code": item_code, "buying": 1}, "price_list_rate"
-        )
+
+        filters = {"item_code": item_code, "buying": 1, "uom": uom}
+        buying_price = frappe.db.get_value("Item Price", filters, "price_list_rate")
+
         if buying_price is not None:
             rate = apply_margin(buying_price, margin_type, margin_percentage_or_amount)
+
     elif margin_based_on == "Valuation Rate":
+
         valuation_rate = get_valuation_rate(
             item_code,
             warehouse=warehouse,
             with_valuation_rate=True,
             with_serial_no=False,
         )
+
         if valuation_rate is not None:
             rate = apply_margin(
                 valuation_rate, margin_type, margin_percentage_or_amount
@@ -121,7 +129,7 @@ def apply_margin(base_rate, margin_type, margin_value):
         return base_rate + margin_value
 
 
-def update_item_price(item_code, price_list, new_rate):
+def update_item_price(item_code, price_list, new_rate, stock_uom=None):
     """
     Update the item price with the new rate checking for batch number and valid dates
     Params: `item_code`, `price_list` and `new_rate`
@@ -133,42 +141,38 @@ def update_item_price(item_code, price_list, new_rate):
     If none of the conditions are met, update the item price with the new rate
     """
 
-    item_price_name = frappe.db.get_value(
-        "Item Price",
-        {"item_code": item_code, "price_list": price_list, "selling": 1},
-        "name",
-    )
+    def update_rate(item_price_name, new_rate):
 
-    # Check for batch number and valid dates
-    batch_no = frappe.db.get_value("Item Price", item_price_name, "batch_no")
-    valid_from = frappe.db.get_value("Item Price", item_price_name, "valid_from")
-    valid_upto = frappe.db.get_value("Item Price", item_price_name, "valid_upto")
-    old_rate = frappe.db.get_value("Item Price", item_price_name, "price_list_rate")
+        # Check for batch number and valid dates
+        batch_no = frappe.db.get_value("Item Price", item_price_name, "batch_no")
+        valid_from = frappe.db.get_value("Item Price", item_price_name, "valid_from")
+        valid_upto = frappe.db.get_value("Item Price", item_price_name, "valid_upto")
+        item_uom = frappe.db.get_value("Item Price", item_price_name, "uom")
+        old_rate = frappe.db.get_value("Item Price", item_price_name, "price_list_rate")
 
-    current_date = datetime.now().date()
+        current_date = datetime.now().date()
 
-    if batch_no:
-        frappe.log_error("Cannot update batched price")
-        return
-
-    if valid_upto:
-        if isinstance(valid_upto, str):
-            valid_upto = datetime.strptime(valid_upto, "%Y-%m-%d").date()
-        if valid_upto < current_date:
-            frappe.log_error("Cannot update price after valid_upto")
+        if batch_no:
             return
 
-    if valid_from:
-        if isinstance(valid_from, str):
-            valid_from = datetime.strptime(valid_from, "%Y-%m-%d").date()
-        if valid_from > current_date:
-            frappe.log_error("Cannot update price before valid_from")
+        if valid_upto:
+            if isinstance(valid_upto, str):
+                valid_upto = datetime.strptime(valid_upto, "%Y-%m-%d").date()
+            if valid_upto < current_date:
+                return
+
+        if valid_from:
+            if isinstance(valid_from, str):
+                valid_from = datetime.strptime(valid_from, "%Y-%m-%d").date()
+            if valid_from > current_date:
+                return
+
+        if stock_uom and item_uom != stock_uom:
             return
 
-    if new_rate <= old_rate:
-        return
+        if new_rate <= old_rate:
+            return
 
-    if item_price_name:
         try:
             frappe.db.set_value(
                 "Item Price", item_price_name, "price_list_rate", new_rate
@@ -176,8 +180,49 @@ def update_item_price(item_code, price_list, new_rate):
 
         except Exception as e:
             frappe.log_error(f"Error updating Item Price: {str(e)}")
+
+        item_price_name = frappe.db.get_value(
+            "Item Price",
+            {"item_code": item_code, "price_list": price_list, "selling": 1},
+            "name",
+        )
+
+    # Filters
+    filters = {
+        "item_code": item_code,
+        "price_list": price_list,
+        "selling": 1,
+        "uom": stock_uom,
+    }
+
+    item_prices = frappe.get_list(
+        "Item Price",
+        filters=filters,
+        fields=["name"],
+    )
+
+    if item_prices:
+        # Update existing item prices
+        for item_price in item_prices:
+            update_rate(item_price["name"], new_rate)
+
     else:
-        frappe.log_error(f"Error updating Item Price: {str(e)}")
+        # Create a new item price if none found
+        try:
+            new_item_price_doc = frappe.get_doc(
+                {
+                    "doctype": "Item Price",
+                    "item_code": item_code,
+                    "price_list": price_list,
+                    "selling": 1,
+                    "price_list_rate": new_rate,
+                    "uom": stock_uom,  # Include stock UOM if provided
+                }
+            )
+            new_item_price_doc.insert()
+
+        except Exception as e:
+            frappe.log_error(f"Error creating new Item Price: {str(e)}")
 
 
 def create_and_process_new_price_list(item):
@@ -194,6 +239,7 @@ def create_and_process_new_price_list(item):
         {
             "doctype": "Item Price",
             "item_code": item.item_code,
+            "uom": item.uom,
             "price_list": "Standard Selling",  # Specify your desired price list name
             "selling": 1,
             "price_list_rate": item.rate,  # Assuming 'rate' is the price you want to set
@@ -202,7 +248,7 @@ def create_and_process_new_price_list(item):
 
     new_price_list_doc.insert()
 
-    time.sleep(5)  # Wait for 5 seconds before processing
+    time.sleep(3)  # Wait for 5 seconds before processing
 
     if frappe.db.exists(
         "Selling Item Price Margin", {"selling_price": new_price_list_doc.price_list}
