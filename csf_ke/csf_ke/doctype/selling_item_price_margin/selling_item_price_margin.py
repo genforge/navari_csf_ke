@@ -27,13 +27,14 @@ class SellingItemPriceMargin(Document):
                 "name": ("!=", self.name),
                 "start_date": ("<=", self.start_date),
                 "end_date": (">=", self.end_date),
+                "item_uom": self.item_uom,
             },
             fields=["name"],
         )
 
         if len(existing_records) > 0:
             frappe.throw(
-                _("Date overlap exists between {0} adn {1}").format(
+                _("Date overlap exists for the same UOM between {0} and {1}").format(
                     self.start_date, self.end_date
                 )
             )
