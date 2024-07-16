@@ -123,8 +123,8 @@ class KenyaSalesTaxReport(object):
 					sale_invoice_doc.posting_date.as_('invoice_date'),
 					sale_invoice_doc.name.as_('invoice_name'),
 					sale_invoice_doc.base_grand_total.as_('invoice_total_sales'),
-					sale_invoice_doc.return_against.as_('return_against'))
-			
+					sale_invoice_doc.return_against.as_('return_against')) \
+			.where(sale_invoice_doc.status != 'Cancelled')
 
 		if company:
 			sales_invoice_query = sales_invoice_query.where(sale_invoice_doc.company == company)
@@ -139,7 +139,6 @@ class KenyaSalesTaxReport(object):
 
 		sales_invoices = sales_invoice_query.run(as_dict=True)
 		return sales_invoices
-
 
 	def get_sales_invoice_items(self, sales_invoice_name, tax_template=None):
 		sales_invoice_item_doc = frappe.qb.DocType('Sales Invoice Item')
