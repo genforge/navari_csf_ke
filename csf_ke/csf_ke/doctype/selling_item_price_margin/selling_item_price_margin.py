@@ -8,12 +8,6 @@ from frappe.model.document import Document
 
 class SellingItemPriceMargin(Document):
 
-    def validate(self):
-
-        # Check if the price list is of type selling
-        if not frappe.get_value("Price List", self.selling_price, "selling") == 1:
-            frappe.throw(_("Selling Price must be of type Selling"))
-
     def before_submit(self):
 
         self.check_date_overlap()
@@ -24,17 +18,22 @@ class SellingItemPriceMargin(Document):
             "Selling Item Price Margin",
             filters={
                 "docstatus": 1,
+                "selling_price": self.selling_price,
                 "name": ("!=", self.name),
                 "start_date": ("<=", self.start_date),
                 "end_date": (">=", self.end_date),
-                "item_uom": self.item_uom,
             },
-            fields=["name"],
+            fields=["selling_price", "start_date", "end_date"],
         )
 
-        if len(existing_records) > 0:
-            frappe.throw(
-                _("Date overlap exists for the same UOM between {0} and {1}").format(
-                    self.start_date, self.end_date
+        if existing_records:
+            overlap_details = [
+                _("Selling price: {0} (From: {1}, To: {2})").format(
+                    rec["selling_price"], rec["start_date"], rec["end_date"]
                 )
+                for rec in existing_records
+            ]
+            frappe.throw(
+                _("Date overlap exists for the same selling price with the following records:\n{0}")
+                .format("\n".join(overlap_details))
             )

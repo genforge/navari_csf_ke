@@ -4,123 +4,71 @@ from erpnext.stock.utils import get_stock_balance
 import time
 from datetime import datetime, date
 
-
 def update_item_prices(doc, method):
-    """
-    Main function triggered on a specific document event e.g., on_submit.
-    Params: `doc` and `method`
-    For each item in the document, retrieve the price list
-    If a price list exists, process it else create and process a new price list
-    """
-
     if doc.doctype == "Purchase Invoice" and not doc.update_stock:
         return
 
+    currency = doc.currency
+
     for item in doc.items:
-        price_list = get_price_list(item.item_code)
+        price_list = get_price_list(item.item_code, currency)
         if price_list:
             process_existing_price_list(item, price_list)
         else:
-            create_and_process_new_price_list(item)
+            create_and_process_new_price_list(item, currency)
 
-
-def get_price_list(item_code):
-    return frappe.db.get_value(
-        "Item Price", {"item_code": item_code, "selling": 1}, "price_list"
+def get_price_list(item_code, currency):
+    price_list = frappe.db.get_value(
+        "Item Price", {"item_code": item_code, "selling": 1, "currency": currency}, "price_list"
     )
-
+    frappe.log_error(f"Fetched price list for item {item_code} with currency {currency}: {str(price_list)[:135]}")
+    return price_list
 
 def process_existing_price_list(item, price_list):
-    """
-    Update the item price based on predefined margin details
-    Params: `item` and `price_list`
-    Check if there are margin details for the price list
-    If margin details exist, calculate the new rate
-    Update the item price with the new rate
-    """
-
-    if frappe.db.exists("Selling Item Price Margin", {"selling_price": price_list}):
-        margin_details = get_margin_details(price_list)
-        if margin_details:
-            new_rate = calculate_new_rate(item.item_code, margin_details)
-            update_item_price(item.item_code, price_list, new_rate, item.uom)
-
+    margin_details = get_margin_details(price_list)
+    if margin_details:
+        new_rate = calculate_new_rate(item.item_code, margin_details)
+        update_item_price(item.item_code, price_list, new_rate, item.uom)
+    else:
+        frappe.log_error(f"No margin details found for price list {str(price_list)[:135]}")
 
 def get_margin_details(price_list):
-    """
-    Get the margin details for the price list
-    Params: `price_list`
-    Check if there are margin details for the price list
-    If margin details exist, return the details
-    Else return None
-    """
-
-    margin_details = {
-        "margin_based_on": frappe.db.get_value(
-            "Selling Item Price Margin",
-            {"selling_price": price_list},
-            "margin_based_on",
-        ),
-        "margin_type": frappe.db.get_value(
-            "Selling Item Price Margin", {"selling_price": price_list}, "margin_type"
-        ),
-        "margin_percentage_or_amount": frappe.db.get_value(
-            "Selling Item Price Margin",
-            {"selling_price": price_list},
-            "margin_percentage_or_amount",
-        ),
-        "warehouse": frappe.db.get_value(
-            "Selling Item Price Margin", {"selling_price": price_list}, "warehouse"
-        ),
-        "uom": frappe.db.get_value(
-            "Selling Item Price Margin", {"selling_price": price_list}, "item_uom"
-        ),
-    }
-    return margin_details if all(margin_details.values()) else None
-
+    margin_details = frappe.db.get_value(
+        "Selling Item Price Margin",
+        {"selling_price": price_list},
+        ["margin_based_on", "margin_type", "margin_percentage_or_amount", "buying_price"],
+        as_dict=True,
+    )
+    return margin_details if margin_details and all(margin_details.values()) else None
 
 def calculate_new_rate(item_code, margin_details):
-    """
-    Calculate the new rate based on the margin details
-    Params: `item_code` and `margin_details`
-    Check if the margin based on is buying price
-    If buying price, retrieve the buying price and apply the margin
-    Check if the margin based on is valuation rate
-    If valuation rate, retrieve the valuation rate and apply the margin
-    Return the new rate
-    """
-
     margin_based_on = margin_details["margin_based_on"]
     margin_type = margin_details["margin_type"]
     margin_percentage_or_amount = margin_details["margin_percentage_or_amount"]
-    warehouse = margin_details["warehouse"]
-    uom = margin_details["uom"]
+    buying_price = margin_details["buying_price"]
     rate = 0
 
     if margin_based_on == "Buying Price":
+        filters = {"item_code": item_code, "buying": 1, "price_list": buying_price}
+        buying_price_rate = frappe.db.get_value("Item Price", filters, "price_list_rate")
 
-        filters = {"item_code": item_code, "buying": 1, "uom": uom}
-        buying_price = frappe.db.get_value("Item Price", filters, "price_list_rate")
+        # Fetch the buying price from the item
+        item_buying_rate = frappe.db.get_value("Item", {"item_code": item_code}, "last_purchase_rate")
 
-        if buying_price is not None:
-            rate = apply_margin(buying_price, margin_type, margin_percentage_or_amount)
+        # Use the higher rate
+        if item_buying_rate and buying_price_rate:
+            higher_rate = max(item_buying_rate, buying_price_rate)
+        elif item_buying_rate:
+            higher_rate = item_buying_rate
+        elif buying_price_rate:
+            higher_rate = buying_price_rate
+        else:
+            frappe.log_error(f"No buying price found for item {item_code} and price list {str(buying_price)[:135]}")
+            return 0
 
-    elif margin_based_on == "Valuation Rate":
-
-        valuation_rate = get_valuation_rate(
-            item_code,
-            warehouse=warehouse,
-            with_valuation_rate=True,
-            with_serial_no=False,
-        )
-
-        if valuation_rate is not None:
-            rate = apply_margin(
-                valuation_rate, margin_type, margin_percentage_or_amount
-            )
-
+        rate = apply_margin(higher_rate, margin_type, margin_percentage_or_amount)
+    
     return rate
-
 
 def apply_margin(base_rate, margin_type, margin_value):
     if margin_type == "Percentage":
@@ -128,22 +76,8 @@ def apply_margin(base_rate, margin_type, margin_value):
     else:
         return base_rate + margin_value
 
-
-def update_item_price(item_code, price_list, new_rate, stock_uom=None):
-    """
-    Update the item price with the new rate checking for batch number and valid dates
-    Params: `item_code`, `price_list` and `new_rate`
-    Retrieve the name of the item price
-    Check for batch number and valid dates
-    If batch number exists, throw an error
-    If `valid_upto` is in the past, throw an error
-    If `valid_from` is in the future, throw an error
-    If none of the conditions are met, update the item price with the new rate
-    """
-
+def update_item_price(item_code, price_list, new_rate, stock_uom=None, currency=None):
     def update_rate(item_price_name, new_rate):
-
-        # Check for batch number and valid dates
         batch_no = frappe.db.get_value("Item Price", item_price_name, "batch_no")
         valid_from = frappe.db.get_value("Item Price", item_price_name, "valid_from")
         valid_upto = frappe.db.get_value("Item Price", item_price_name, "valid_upto")
@@ -167,9 +101,6 @@ def update_item_price(item_code, price_list, new_rate, stock_uom=None):
             if valid_from > current_date:
                 return
 
-        if stock_uom and item_uom != stock_uom:
-            return
-
         if new_rate <= old_rate:
             return
 
@@ -177,22 +108,13 @@ def update_item_price(item_code, price_list, new_rate, stock_uom=None):
             frappe.db.set_value(
                 "Item Price", item_price_name, "price_list_rate", new_rate
             )
-
         except Exception as e:
-            frappe.log_error(f"Error updating Item Price: {str(e)}")
+            frappe.log_error(f"Error updating Item Price {item_price_name}: {str(e)[:135]}")
 
-        item_price_name = frappe.db.get_value(
-            "Item Price",
-            {"item_code": item_code, "price_list": price_list, "selling": 1},
-            "name",
-        )
-
-    # Filters
     filters = {
         "item_code": item_code,
         "price_list": price_list,
         "selling": 1,
-        "uom": stock_uom,
     }
 
     item_prices = frappe.get_list(
@@ -201,13 +123,13 @@ def update_item_price(item_code, price_list, new_rate, stock_uom=None):
         fields=["name"],
     )
 
+
+    item = frappe.get_doc("Item", item_code)
+
     if item_prices:
-        # Update existing item prices
         for item_price in item_prices:
             update_rate(item_price["name"], new_rate)
-
     else:
-        # Create a new item price if none found
         try:
             new_item_price_doc = frappe.get_doc(
                 {
@@ -216,39 +138,33 @@ def update_item_price(item_code, price_list, new_rate, stock_uom=None):
                     "price_list": price_list,
                     "selling": 1,
                     "price_list_rate": new_rate,
-                    "uom": stock_uom,  # Include stock UOM if provided
+                    "uom": item.uom,
                 }
             )
             new_item_price_doc.insert()
-
         except Exception as e:
-            frappe.log_error(f"Error creating new Item Price: {str(e)}")
+            frappe.log_error(f"Error creating new Item Price for item {item_code}: {str(e)[:135]}")
 
+def create_and_process_new_price_list(item, currency):
+    new_item_price = frappe.db.get_single_value("New Item Price", "new_item_price")
 
-def create_and_process_new_price_list(item):
-    """
-    Create a new price list and process it
-    Params: `item`
-    Create a new Item Price document with the item details and desired price list.
-    Wait for 5 seconds before further processing.
-    Check if margin details exist for the new price list.
-    If margin details exist, calculate the new rate using calculate_new_rate.
-    Update the item price with the new rate using update_item_price.
-    """
     new_price_list_doc = frappe.get_doc(
         {
             "doctype": "Item Price",
             "item_code": item.item_code,
             "uom": item.uom,
-            "price_list": "Standard Selling",  # Specify your desired price list name
+            "price_list": new_item_price,
             "selling": 1,
-            "price_list_rate": item.rate,  # Assuming 'rate' is the price you want to set
+            "price_list_rate": item.rate,
+            "currency": currency,
         }
     )
 
-    new_price_list_doc.insert()
-
-    time.sleep(3)  # Wait for 5 seconds before processing
+    try:
+        new_price_list_doc.insert()
+    except Exception as e:
+        frappe.log_error(f"Error creating new price list for item {item.item_code}: {str(e)[:135]}")
+        return
 
     if frappe.db.exists(
         "Selling Item Price Margin", {"selling_price": new_price_list_doc.price_list}
@@ -256,36 +172,10 @@ def create_and_process_new_price_list(item):
         margin_details = get_margin_details(new_price_list_doc.price_list)
         if margin_details:
             new_rate = calculate_new_rate(item.item_code, margin_details)
-            update_item_price(item.item_code, new_price_list_doc.price_list, new_rate)
-
-
-@frappe.whitelist()
-def get_valuation_rate(
-    item_code,
-    warehouse,
-    posting_date=None,
-    posting_time=None,
-    with_valuation_rate=True,
-    with_serial_no=False,
-):
-    stock_balance = get_stock_balance(
-        item_code=item_code,
-        warehouse=warehouse,
-        posting_date=posting_date,
-        posting_time=posting_time,
-        with_valuation_rate=with_valuation_rate,
-        with_serial_no=with_serial_no,
-    )
-
-    if isinstance(stock_balance, tuple):
-        # Convert tuple to dictionary
-        dictionary_data = {index: value for index, value in enumerate(stock_balance)}
-        # Retrieve valuation rate from dictionary if it exists
-        valuation_rate = dictionary_data.get(1)
-        if valuation_rate is not None:
-            # Return only the valuation rate
-            return valuation_rate
+            update_item_price(
+                item.item_code,
+                new_price_list_doc.price_list,
+                new_rate,
+            )
         else:
-            frappe.log_error("Valuation rate not found in stock balance")
-    else:
-        frappe.log_error("Invalid stock balance format")
+            frappe.log_error(f"No margin details found for new price list {str(new_price_list_doc.price_list)[:135]}")
