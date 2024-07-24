@@ -15,7 +15,7 @@
   "section_break_mayg",
   "selling_price",
   "column_break_lymo",
-  "new_selling_item_price",
+  "currency",
   "price_margin_type_section",
   "margin_based_on",
   "column_break_hckd",
@@ -139,16 +139,17 @@
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "new_selling_item_price",
+   "fieldname": "currency",
    "fieldtype": "Link",
-   "label": "New Selling Item Price",
-   "options": "Price List"
+   "label": "Currency",
+   "options": "Currency",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-07-24 07:26:31.286071",
+ "modified": "2024-07-24 09:21:25.034433",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",

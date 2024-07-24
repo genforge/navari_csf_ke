@@ -21,7 +21,6 @@ def get_price_list(item_code, currency):
     price_list = frappe.db.get_value(
         "Item Price", {"item_code": item_code, "selling": 1, "currency": currency}, "price_list"
     )
-    frappe.log_error(f"Fetched price list for item {item_code} with currency {currency}: {str(price_list)[:135]}")
     return price_list
 
 def process_existing_price_list(item, price_list):
