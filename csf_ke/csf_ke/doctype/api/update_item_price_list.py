@@ -49,23 +49,9 @@ def calculate_new_rate(item_code, margin_details):
 
     if margin_based_on == "Buying Price":
         filters = {"item_code": item_code, "buying": 1, "price_list": buying_price}
-        buying_price_rate = frappe.db.get_value("Item Price", filters, "price_list_rate")
+        buying_price_rate = frappe.db.get_value("Item Price", filters, "price_list_rate")        
 
-        # Fetch the buying price from the item
-        item_buying_rate = frappe.db.get_value("Item", {"item_code": item_code}, "last_purchase_rate")
-
-        # Use the higher rate
-        if item_buying_rate and buying_price_rate:
-            higher_rate = max(item_buying_rate, buying_price_rate)
-        elif item_buying_rate:
-            higher_rate = item_buying_rate
-        elif buying_price_rate:
-            higher_rate = buying_price_rate
-        else:
-            frappe.log_error(f"No buying price found for item {item_code} and price list {str(buying_price)[:135]}")
-            return 0
-
-        rate = apply_margin(higher_rate, margin_type, margin_percentage_or_amount)
+        rate = apply_margin(buying_price_rate, margin_type, margin_percentage_or_amount)
     
     return rate
 
