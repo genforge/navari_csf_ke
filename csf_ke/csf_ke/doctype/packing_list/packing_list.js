@@ -3,7 +3,6 @@
 
 frappe.ui.form.on('Packing List', {
   get_sales_invoices_and_items: function (frm) {
-    console.log('MEthod get_submitted_sales_invoices_and_items executed');
     frappe.call({
       method: 'get_submitted_sales_invoices_and_items',
       doc: frm.doc,

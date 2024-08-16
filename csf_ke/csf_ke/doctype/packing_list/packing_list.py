@@ -148,7 +148,7 @@ def get_sales_invoices(doc: Document):
         FROM `tabSales Invoice` si
         WHERE si.docstatus = 1
             AND si.is_return != 1
-            AND si.company = %(company) s 
+            AND si.company = %(company)s 
             {0}
             AND (
                 si.name NOT in (
@@ -223,7 +223,6 @@ def get_credit_notes(self, original_sales_invoice, pwhich):
 
 # Get list of Credit Note Items query
 def get_credit_note_items(self, item_code):
-
     si_list = self.get_si_list("sales_invoice", "sales_invoices")
 
     cr_total_qty = 0
