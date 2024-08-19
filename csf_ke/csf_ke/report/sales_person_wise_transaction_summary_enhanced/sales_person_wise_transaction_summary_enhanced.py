@@ -169,6 +169,30 @@ def get_columns(filters):
     return columns
 
 
+def get_duration_clause(filters):
+    duration_clause = None
+    if filters["duration"] == "Monthly":
+        duration_clause = "MONTH(dt.{}) as duration"
+
+    elif filters["duration"] == "Quarterly":
+        duration_clause = "QUARTER(dt.{}) as duration"
+
+    elif filters["duration"] == "Yearly":
+        duration_clause = "YEAR(dt.{}) as duration"
+
+    elif filters["duration"] == "Weekly":
+        duration_clause = "WEEK(dt.{}) as duration"
+
+    if duration_clause:
+        if filters["doc_type"] in ("Sales Invoice", "Delivery Note"):
+            duration_clause = duration_clause.format("posting_date")
+
+        else:
+            duration_clause = duration_clause.format("transaction_date")
+
+    return duration_clause
+
+
 def get_entries(filters):
     date_field = (
         filters["doc_type"] == "Sales Order" and "transaction_date" or "posting_date"
@@ -178,23 +202,8 @@ def get_entries(filters):
     else:
         qty_field = "qty"
 
-    duration_clause = None
-    if filters["duration"] == "Monthly":
-        duration_clause = "MONTH(dt.{}) as duration"
-    elif filters["duration"] == "Quarterly":
-        duration_clause = "QUARTER(dt.{}) as duration"
-    elif filters["duration"] == "Yearly":
-        duration_clause = "YEAR(dt.{}) as duration"
-    elif filters["duration"] == "Weekly":
-        duration_clause = "WEEK(dt.{}) as duration"
-
-    if duration_clause and filters["doc_type"] in ("Sales Invoice", "Delivery Note"):
-        duration_clause = duration_clause.format("posting_date")
-
-    else:
-        duration_clause = duration_clause.format("transaction_date")
-
     conditions, values = get_conditions(filters, date_field)
+    duration_clause = get_duration_clause(filters)
 
     entries = frappe.db.sql(
         """
