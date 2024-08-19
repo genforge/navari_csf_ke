@@ -47,8 +47,6 @@ def execute(filters=None):
             row.company_currency = d.company_currency
             row.currency = company_currency
 
-            # data.append(row)
-
     for _ in grouped.values():
         data.extend(_)
 
@@ -180,16 +178,21 @@ def get_entries(filters):
     else:
         qty_field = "qty"
 
-    # TODO: Implement duration based filters
     duration_clause = None
     if filters["duration"] == "Monthly":
-        duration_clause = "MONTH(dt.posting_date) as duration"
+        duration_clause = "MONTH(dt.{}) as duration"
     elif filters["duration"] == "Quarterly":
-        duration_clause = "QUARTER(dt.posting_date) as duration"
+        duration_clause = "QUARTER(dt.{}) as duration"
     elif filters["duration"] == "Yearly":
-        duration_clause = "YEAR(dt.posting_date) as duration"
+        duration_clause = "YEAR(dt.{}) as duration"
     elif filters["duration"] == "Weekly":
-        duration_clause = "WEEK(dt.posting_date) as duration"
+        duration_clause = "WEEK(dt.{}) as duration"
+
+    if duration_clause and filters["doc_type"] in ("Sales Invoice", "Delivery Note"):
+        duration_clause = duration_clause.format("posting_date")
+
+    else:
+        duration_clause = duration_clause.format("transaction_date")
 
     conditions, values = get_conditions(filters, date_field)
 
