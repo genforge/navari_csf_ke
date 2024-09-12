@@ -8,6 +8,7 @@ frappe.ui.form.on("Selling Item Price Margin", {
       return {
         filters: {
           selling: 1,
+          currency: frm.doc.currency,
         },
       };
     });
@@ -15,6 +16,7 @@ frappe.ui.form.on("Selling Item Price Margin", {
       return {
         filters: {
           buying: 1,
+          currency: frm.doc.currency,
         },
       };
     });
