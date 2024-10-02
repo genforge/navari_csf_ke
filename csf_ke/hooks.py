@@ -200,3 +200,10 @@ user_data_fields = [
 # auth_hooks = [
 # 	"csf_ke.auth.validate"
 # ]
+
+# add methods to jinja environment
+jinja = {
+    "methods": [
+        "csf_ke.csf_ke.utils.qr_code_generator.get_qr_code"
+    ]
+}
