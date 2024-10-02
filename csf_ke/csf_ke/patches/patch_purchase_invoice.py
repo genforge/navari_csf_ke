@@ -20,7 +20,8 @@ def execute():
                 "collapsible": 0,
                 "insert_after": "etr_data",
                 "allow_on_submit": True,
-                "translatable": 1
+                "translatable": 1,
+                "no_copy": 1
             }
         ]
     }
