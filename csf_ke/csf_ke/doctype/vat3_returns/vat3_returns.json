@@ -6,6 +6,16 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_gyiq",
+  "company",
+  "from_date",
+  "column_break_gejf",
+  "buying",
+  "selling",
+  "to_date",
+  "section_break_lbra",
+  "fetch_invoices",
+  "invoices",
+  "section_break_lvzd",
   "amended_from"
  ],
  "fields": [
@@ -22,12 +32,67 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_gejf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_lvzd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_lbra",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "fetch_invoices",
+   "fieldtype": "Button",
+   "label": "Fetch Invoices"
+  },
+  {
+   "fieldname": "invoices",
+   "fieldtype": "Table",
+   "label": "Invoices",
+   "options": "VAT3 Returns Invoice"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "buying",
+   "fieldtype": "Check",
+   "label": "Buying"
+  },
+  {
+   "default": "0",
+   "fieldname": "selling",
+   "fieldtype": "Check",
+   "label": "Selling"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-08 08:30:50.441399",
+ "modified": "2024-10-10 09:00:56.981352",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "VAT3 Returns",
