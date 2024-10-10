@@ -15,12 +15,7 @@ class VAT3Returns(Document):
         pass
 
 @frappe.whitelist()
-def fetch_invoices(buying, selling, from_date, to_date, company):
-
-    if buying == '1':
-        invoice_type = "Purchase Invoice"
-    elif selling == '1':
-        invoice_type = "Sales Invoice"
+def fetch_invoices(invoice_type, from_date, to_date, company):
 
     invoices =  frappe.get_all(
         invoice_type,
@@ -31,8 +26,7 @@ def fetch_invoices(buying, selling, from_date, to_date, company):
             "is_filed": 0
         },
         fields=["name", "grand_total"],
+        order_by="posting_date desc"
     )
-
-    frappe.msgprint(str(invoices))
 
     return invoices

@@ -16,8 +16,7 @@
         frappe.call({
             method: 'csf_ke.csf_ke.doctype.vat3_returns.vat3_returns.fetch_invoices',
             args: {
-                buying: frm.doc.buying,
-                selling: frm.doc.selling,
+                invoice_type: frm.doc.selling ? "Sales Invoice" : "Purchase Invoice",
                 from_date: frm.doc.from_date,
                 to_date: frm.doc.to_date,
                 company: frm.doc.company
@@ -26,18 +25,23 @@
 
                 if (r.message) {
 
-                    frm.clear_table('vat3_returns_invoices');
+                    frm.clear_table('invoices');
 
                     r.message.forEach(function(invoice) {
 
-                        let row = frm.add_child('vat3_returns_invoices');
+                        let row = frm.add_child('invoices');
                         row.document_type = frm.doc.selling ? "Sales Invoice" : "Purchase Invoice";
                         row.invoice_number = invoice.name;
                         row.invoice_date = invoice.posting_date;
                         row.invoice_amount = invoice.grand_total;
                 });
-                frm.refresh_field('vat3_returns_invoices');
+                frm.refresh_field('invoices');
+                } else {
+                    console.error("No message received");
                 }
+            },
+            error: function(err) {
+                console.error("Error in fetching invoices:", err);
             }
         });
     },
