@@ -12,7 +12,21 @@ class VAT3Returns(Document):
         pass
 
     def on_submit(self):
-        pass
+        self.mark_invoices_as_filed()
+
+    def mark_invoices_as_filed(self):
+
+        doctype_map = {
+            "Sales Invoice": "Sales Invoice",
+            "Purchase Invoice": "Purchase Invoice",
+        }
+
+        for invoice in self.invoices:
+            if invoice.document_type in doctype_map:
+                invoice_doc = frappe.get_doc(doctype_map[invoice.document_type], invoice.invoice_number)
+                invoice_doc.is_filed = 1
+                invoice_doc.save()
+
 
 @frappe.whitelist()
 def fetch_invoices(invoice_type, from_date, to_date, company):
