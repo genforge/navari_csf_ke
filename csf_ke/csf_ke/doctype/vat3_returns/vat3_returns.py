@@ -12,9 +12,12 @@ class VAT3Returns(Document):
         pass
 
     def on_submit(self):
-        self.mark_invoices_as_filed()
+        self.mark_invoices_as_filed(is_filed=1)
 
-    def mark_invoices_as_filed(self):
+    def on_cancel(self):
+        self.mark_invoices_as_filed(is_filed=0)
+
+    def mark_invoices_as_filed(self, is_filed):
 
         doctype_map = {
             "Sales Invoice": "Sales Invoice",
@@ -24,7 +27,7 @@ class VAT3Returns(Document):
         for invoice in self.invoices:
             if invoice.document_type in doctype_map:
                 invoice_doc = frappe.get_doc(doctype_map[invoice.document_type], invoice.invoice_number)
-                invoice_doc.is_filed = 1
+                invoice_doc.is_filed = is_filed
                 invoice_doc.save()
 
 
