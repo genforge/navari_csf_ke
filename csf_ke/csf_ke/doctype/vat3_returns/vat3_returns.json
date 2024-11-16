@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "naming_series:",
  "creation": "2024-10-08 08:30:50.441399",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -8,9 +9,10 @@
   "section_break_gyiq",
   "company",
   "from_date",
+  "naming_series",
   "column_break_gejf",
-  "buying",
   "selling",
+  "buying",
   "to_date",
   "section_break_lbra",
   "fetch_invoices",
@@ -54,6 +56,7 @@
    "fieldtype": "Section Break"
   },
   {
+   "depends_on": "eval: doc.to_date;",
    "fieldname": "fetch_invoices",
    "fieldtype": "Button",
    "label": "Fetch Invoices"
@@ -83,22 +86,31 @@
    "label": "Buying"
   },
   {
-   "default": "0",
+   "default": "1",
    "fieldname": "selling",
    "fieldtype": "Check",
    "label": "Selling"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "VAT3-.DD.-.MM.-"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-10 09:00:56.981352",
+ "modified": "2024-11-13 14:45:20.385628",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "VAT3 Returns",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,

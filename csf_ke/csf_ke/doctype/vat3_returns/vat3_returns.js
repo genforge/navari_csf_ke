@@ -12,6 +12,13 @@
  	        frm.set_value('buying', 0);
  	    }
  	},
+ 	from_date: function(frm){
+ 	    if (frm.doc.from_date) {
+ 	        let fromDate = new Date(frm.doc.from_date);
+ 	        let endOfMonth = new Date(fromDate.getFullYear(), fromDate.getMonth() + 1, 0);
+ 	        frm.set_value('to_date', endOfMonth.toISOString().split('T')[0]);
+ 	    }
+ 	},
     fetch_invoices: function(frm) {
         frappe.call({
             method: 'csf_ke.csf_ke.doctype.vat3_returns.vat3_returns.fetch_invoices',
@@ -33,15 +40,23 @@
                         row.document_type = frm.doc.selling ? "Sales Invoice" : "Purchase Invoice";
                         row.invoice_number = invoice.name;
                         row.invoice_date = invoice.posting_date;
-                        row.invoice_amount = invoice.grand_total;
+                        row.taxable_value = invoice.total;
+                        row.pin_number = invoice.tax_id;
+                        if (row.document_type == "Sales Invoice") {
+                            row.etr_serial_number = invoice.etr_serial_number;
+                            row.supplier_name = invoice.customer;
+                        } else {
+                            row.etr_serial_number = invoice.etr_invoice_number;
+                            row.supplier_name = invoice.supplier;
+                        }
                 });
                 frm.refresh_field('invoices');
                 } else {
-                    console.error("No message received");
+                    frappe.msgprint(__('No invoices found for the selected period.'));
                 }
             },
             error: function(err) {
-                console.error("Error in fetching invoices:", err);
+                frappe.msgprint(__('There was an error fetching invoices.'));
             }
         });
     },
