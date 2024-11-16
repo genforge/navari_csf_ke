@@ -30,6 +30,18 @@ fixtures = [
             ]
         ],
     },
+    {
+        "doctype": "DocType Link",
+        "filters": [
+            [
+                "link_doctype",
+                "in",
+                (
+                    "Employee Dependent and Beneficiary",
+                ),
+            ]
+        ],
+    },
 ]
 
 # Includes in <head>
