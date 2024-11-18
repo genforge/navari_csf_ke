@@ -8,6 +8,9 @@ frappe.ui.form.on("Employee Dependent and Beneficiary", {
   dob: function (frm) {
     calculate_and_set_age(frm);
   },
+  employee: function (frm) {
+    fetch_and_set_employee_name(frm);
+  },
 });
 
 function calculate_and_set_age(frm) {
@@ -26,5 +29,19 @@ function calculate_and_set_age(frm) {
     frm.set_value("age", age);
   } else {
     frm.set_value("age", null);
+  }
+}
+
+function fetch_and_set_employee_name(frm) {
+  if (frm.doc.employee) {
+    frappe.db.get_value("Employee", frm.doc.employee, "employee_name", (r) => {
+      if (r && r.employee_name) {
+        frm.set_value("employee_name", r.employee_name);
+      } else {
+        frm.set_value("employee_name", null);
+      }
+    });
+  } else {
+    frm.set_value("employee_name", null);
   }
 }
