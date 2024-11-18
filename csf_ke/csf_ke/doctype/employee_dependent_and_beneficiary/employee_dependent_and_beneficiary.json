@@ -7,16 +7,17 @@
  "field_order": [
   "employee",
   "employee_name",
-  "type",
-  "relationship",
-  "gender",
-  "address",
-  "column_break_urge",
   "first_name",
   "middle_name",
   "last_name",
+  "column_break_urge",
+  "gender",
   "dob",
-  "age"
+  "age",
+  "column_break_tfoz",
+  "type",
+  "relationship",
+  "address"
  ],
  "fields": [
   {
@@ -90,11 +91,15 @@
    "fieldtype": "Data",
    "label": "Employee Name",
    "read_only": 1
+  },
+  {
+   "fieldname": "column_break_tfoz",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2024-11-16 19:30:43.529167",
+ "modified": "2024-11-18 10:49:29.827612",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Employee Dependent and Beneficiary",
