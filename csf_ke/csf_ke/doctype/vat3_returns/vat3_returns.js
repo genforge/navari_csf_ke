@@ -5,12 +5,16 @@
  	buying: function(frm) {
  	    if (frm.doc.buying) {
  	        frm.set_value('selling', 0);
- 	    }
+ 	    } else {
+            frm.set_value('selling', 1);
+        }
  	},
  	selling: function(frm) {
  	    if (frm.doc.selling) {
  	        frm.set_value('buying', 0);
- 	    }
+ 	    } else {
+            frm.set_value('buying', 1);
+        }
  	},
  	from_date: function(frm){
  	    if (frm.doc.from_date) {
@@ -20,6 +24,9 @@
  	    }
  	},
     fetch_invoices: function(frm) {
+
+        frm.clear_table('invoices');
+
         frappe.call({
             method: 'fetch_invoices',
             doc: frm.doc,

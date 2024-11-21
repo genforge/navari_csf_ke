@@ -32,10 +32,6 @@ class VAT3Returns(Document):
 
     @frappe.whitelist()
     def fetch_invoices(self, invoice_type, from_date, to_date, company):
-        if invoice_type == "Sales Invoice":
-            fields = ["name", "posting_date", "total", "tax_id", "etr_serial_number", "customer"]
-        elif invoice_type == "Purchase Invoice":
-            fields = ["name", "posting_date", "total", "tax_id", "etr_invoice_number", "supplier"]
 
         invoices =  frappe.get_all(
             invoice_type,
@@ -45,7 +41,14 @@ class VAT3Returns(Document):
                 "company": company,
                 "is_filed": 0
             },
-            fields=fields,
+            fields=[
+                "name", 
+                "posting_date", 
+                "total", 
+                "tax_id", 
+                "etr_serial_number" if invoice_type == "Sales Invoice" else "etr_invoice_number",
+                "customer" if invoice_type == "Sales Invoice" else "supplier"
+            ],
             order_by="posting_date desc"
         )
 
@@ -54,15 +57,29 @@ class VAT3Returns(Document):
             return
 
         # Populate the child table
-        for invoice in invoices:
-            self.append("invoices", {
-                "document_type": invoice_type,
-                "invoice_number": invoice.get("name"),
-                "invoice_date": invoice.get("posting_date"),
-                "taxable_value": invoice.get("total"),
-                "pin_number": invoice.get("tax_id"),
-                "etr_serial_number": invoice.get("etr_serial_number") or invoice.get("etr_invoice_number"),
-                "supplier_name": invoice.get("customer") or invoice.get("supplier"),
-            })
+        for invoice_data in invoices:
+
+            invoice = frappe.get_doc(invoice_type, invoice_data.name)
+
+            for item in invoice.items:
+                tax_rate = 0
+
+                if item.get("item_tax_template"):
+                    tax_template = frappe.get_doc("Item Tax Template", item.item_tax_template)
+                
+                    if tax_template.taxes:
+                        tax_rate = tax_template.taxes[0].tax_rate
+
+
+                self.append("invoices", {
+                    "document_type": invoice_type,
+                    "invoice_number": invoice.name,
+                    "invoice_date": invoice.posting_date,
+                    "taxable_value": item.net_amount,
+                    "pin_number": invoice.tax_id,
+                    "tax_rate": tax_rate,
+                    "etr_serial_number": invoice.etr_serial_number or invoice.etr_invoice_number,
+                    "supplier_name": invoice.customer or invoice.supplier,
+                })
 
         frappe.msgprint(_("Invoices fetched successfully"))
