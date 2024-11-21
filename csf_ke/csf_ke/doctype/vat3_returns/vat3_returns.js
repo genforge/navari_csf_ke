@@ -21,7 +21,8 @@
  	},
     fetch_invoices: function(frm) {
         frappe.call({
-            method: 'csf_ke.csf_ke.doctype.vat3_returns.vat3_returns.fetch_invoices',
+            method: 'fetch_invoices',
+            doc: frm.doc,
             args: {
                 invoice_type: frm.doc.selling ? "Sales Invoice" : "Purchase Invoice",
                 from_date: frm.doc.from_date,
@@ -29,31 +30,7 @@
                 company: frm.doc.company
             },
             callback: function(r) {
-
-                if (r.message) {
-
-                    frm.clear_table('invoices');
-
-                    r.message.forEach(function(invoice) {
-
-                        let row = frm.add_child('invoices');
-                        row.document_type = frm.doc.selling ? "Sales Invoice" : "Purchase Invoice";
-                        row.invoice_number = invoice.name;
-                        row.invoice_date = invoice.posting_date;
-                        row.taxable_value = invoice.total;
-                        row.pin_number = invoice.tax_id;
-                        if (row.document_type == "Sales Invoice") {
-                            row.etr_serial_number = invoice.etr_serial_number;
-                            row.supplier_name = invoice.customer;
-                        } else {
-                            row.etr_serial_number = invoice.etr_invoice_number;
-                            row.supplier_name = invoice.supplier;
-                        }
-                });
                 frm.refresh_field('invoices');
-                } else {
-                    frappe.msgprint(__('No invoices found for the selected period.'));
-                }
             },
             error: function(err) {
                 frappe.msgprint(__('There was an error fetching invoices.'));
