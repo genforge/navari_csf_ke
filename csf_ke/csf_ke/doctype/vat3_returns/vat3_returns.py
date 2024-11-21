@@ -70,6 +70,15 @@ class VAT3Returns(Document):
                     if tax_template.taxes:
                         tax_rate = tax_template.taxes[0].tax_rate
 
+                else:
+                    invoice_taxes = invoice.taxes
+
+                    if invoice_taxes:
+                        for tax in invoice_taxes:
+                            if tax.rate:
+                                tax_rate = tax.rate
+                                break
+
 
                 self.append("invoices", {
                     "document_type": invoice_type,
