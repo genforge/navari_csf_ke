@@ -37,7 +37,12 @@ def update_item_prices(doc, method):
 
                 # Update or create price list based on the fetched margins
                 if existing_item_price:
-                    process_existing_price_list(item, selling_price_list, margin_details, existing_item_price['price_list_rate'])
+                    # Validate batch_no and date range before updating
+                    if not existing_item_price.get("batch_no") and validate_date_range(
+                        existing_item_price.get("valid_from"),
+                        existing_item_price.get("valid_upto")
+                    ):
+                        process_existing_price_list(item, selling_price_list, margin_details, existing_item_price['price_list_rate'])
                 else:
                     create_and_process_new_price_list(item, selling_price_list, margin_details, currency)
             else:
@@ -98,7 +103,7 @@ def check_existing_item_price(item_code, price_list, uom):
     existing_item_price = frappe.db.get_all(
         "Item Price",
         filters={"item_code": item_code, "price_list": price_list, "uom": uom},
-        fields=["name", "price_list_rate"],
+        fields=["name", "price_list_rate", "batch_no", "valid_from", "valid_upto"],
         limit=1
     )
     return existing_item_price[0] if existing_item_price else None
@@ -204,3 +209,25 @@ def update_item_price(item_code, price_list, new_rate, uom):
         )
     except Exception as e:
         frappe.log_error(f"Error updating Item Price for {item_code}: {str(e)[:135]}")
+
+
+def validate_date_range(valid_from, valid_to):
+    """
+    Validate if the current date falls within the valid_from and valid_to range.
+
+    Args:
+        valid_from (date): The starting validity date.
+        valid_to (date): The ending validity date.
+
+    Returns:
+        bool: True if valid_from and valid_to are valid or not provided, False otherwise.
+    """
+    today = date.today()
+
+    if valid_from and valid_to:
+        return valid_from <= today <= valid_to
+    elif valid_from:
+        return valid_from <= today
+    elif valid_to:
+        return today <= valid_to
+    return True
