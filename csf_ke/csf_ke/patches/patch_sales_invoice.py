@@ -19,7 +19,8 @@ def execute():
                 "collapsible": 0,
                 "insert_after": "etr_data",
                 "allow_on_submit": True,
-                "translatable": 1
+                "translatable": 1,
+                "no_copy": 1
             },
             {
                 "fieldname": "cu_invoice_date",
@@ -28,7 +29,8 @@ def execute():
                 "collapsible": 0,
                 "insert_after": "etr_serial_number",
                 "allow_on_submit": True,
-                "translatable": 1
+                "translatable": 1,
+                "no_copy": 1
             },
             {
                 "fieldname": "etr_column_break",
@@ -43,7 +45,8 @@ def execute():
                 "collapsible": 0,
                 "insert_after": "etr_column_break",
                 "allow_on_submit": True,
-                "translatable": 1
+                "translatable": 1,
+                "no_copy": 1
             },
             {
                 "fieldname": "cu_link",
@@ -52,7 +55,8 @@ def execute():
                 "collapsible": 0,
                 "insert_after": "etr_invoice_number",
                 "allow_on_submit": True,
-                "translatable": 1
+                "translatable": 1,
+                "no_copy": 1
             }
         ]
     }
