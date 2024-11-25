@@ -30,6 +30,49 @@ class VAT3Returns(Document):
                 invoice_doc.is_filed = is_filed
                 invoice_doc.save()
 
+    def get_item_tax_rate(self, item):
+        """Fetch the tax rate from the item's tax template if available."""
+        if item.get("item_tax_template"):
+            try:
+                tax_template = frappe.get_doc("Item Tax Template", item.item_tax_template)
+                if tax_template.taxes and len(tax_template.taxes) > 0:
+                    return tax_template.taxes[0].tax_rate
+                
+            except frappe.DoesNotExistError:
+                frappe.msgprint(_("The Item Tax Template '{0}' does not exist.").format(item.item_tax_template))
+
+            except Exception as e:
+                frappe.log_error(e, _("Error fetching tax rate from Item Tax Template"))
+        
+        return None
+    
+    def items_tax_fields(self, doc):
+        """Fetch tax rate from the Sales Taxes and Charges Template."""
+        if not doc.taxes_and_charges:
+            return 0
+
+        try:
+            tax_template = frappe.get_doc("Sales Taxes and Charges Template", doc.taxes_and_charges)
+            if tax_template.taxes and len(tax_template.taxes) > 0:
+                return tax_template.taxes[0].rate
+            
+        except frappe.DoesNotExistError:
+            frappe.msgprint(_("The Sales Taxes and Charges Template '{0}' does not exist.").format(doc.taxes_and_charges))
+        except Exception as e:
+
+            frappe.log_error(e, _("Error fetching tax rate from Sales Taxes and Charges Template"))
+        
+        return 0
+    
+    def calculate_tax(self, doc):
+        """Calculate and assign tax for each item"""
+        for item in doc.items:
+            tax_rate = self.get_item_tax_rate(item) or self.item_tax_fields(doc)
+            tax = item.net_amount * (tax_rate / 100) if tax_rate else 0
+
+            return tax
+
+
     @frappe.whitelist()
     def fetch_invoices(self, invoice_type, from_date, to_date, company):
 
@@ -62,22 +105,8 @@ class VAT3Returns(Document):
             invoice = frappe.get_doc(invoice_type, invoice_data.name)
 
             for item in invoice.items:
-                tax_rate = 0
 
-                if item.get("item_tax_template"):
-                    tax_template = frappe.get_doc("Item Tax Template", item.item_tax_template)
-                
-                    if tax_template.taxes:
-                        tax_rate = tax_template.taxes[0].tax_rate
-
-                else:
-                    invoice_taxes = invoice.taxes
-
-                    if invoice_taxes:
-                        for tax in invoice_taxes:
-                            if tax.rate:
-                                tax_rate = tax.rate
-                                break
+                tax_rate = self.calculate_tax(invoice)
 
 
                 self.append("invoices", {
