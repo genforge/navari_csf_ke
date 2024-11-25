@@ -6,6 +6,9 @@ app_publisher = "Navari Ltd"
 app_description = (
     "ERPNext and FrappeHR Country Specific Customizations for Kenya by Navari Ltd"
 )
+app_description = (
+    "ERPNext and FrappeHR Country Specific Customizations for Kenya by Navari Ltd"
+)
 app_icon = "drag"
 app_color = "grey"
 app_email = "info@navari.co.ke"
@@ -138,6 +141,14 @@ fixtures = [
 # 	}
 # }
 
+doc_events = {
+    "Purchase Receipt": {
+        "on_submit": "csf_ke.csf_ke.doctype.api.update_item_price_list.update_item_prices"
+    },
+    "Purchase Invoice": {
+        "on_submit": "csf_ke.csf_ke.doctype.api.update_item_price_list.update_item_prices"
+    },
+}
 # Scheduled Tasks
 # ---------------
 
