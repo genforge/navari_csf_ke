@@ -67,7 +67,7 @@ class VAT3Returns(Document):
     def calculate_tax(self, doc):
         """Calculate and assign tax for each item"""
         for item in doc.items:
-            tax_rate = self.get_item_tax_rate(item) or self.item_tax_fields(doc)
+            tax_rate = self.get_item_tax_rate(item) or self.items_tax_fields(doc)
             tax = item.net_amount * (tax_rate / 100) if tax_rate else 0
 
             return tax
@@ -80,6 +80,7 @@ class VAT3Returns(Document):
             invoice_type,
             filters={
                 "docstatus": 1,
+                "is_return": 0,
                 "posting_date": ["between", [from_date, to_date]],
                 "company": company,
                 "is_filed": 0
