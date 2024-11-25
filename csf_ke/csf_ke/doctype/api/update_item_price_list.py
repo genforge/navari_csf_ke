@@ -31,12 +31,20 @@ def update_item_prices(doc, method):
             # Fetch margin details for the selling price list
             margin_details = get_margin_details(selling_price_list)
 
-            if margin_details:
-                # Check if the item already has an item price for the selling price list
-                existing_item_price = check_existing_item_price(item.item_code, selling_price_list, item.uom)
+            if not margin_details:
+                frappe.log_error(f"No margin details found for selling price list {selling_price_list}")
+                continue
 
-                # Update or create price list based on the fetched margins
-                if existing_item_price:
+            # Check if the item already has an item price for the selling price list
+            existing_item_price = check_existing_item_price(item.item_code, selling_price_list, item.uom)
+
+            # Update or create price list based on the fetched margins
+            if existing_item_price:
+                if margin_details.get("new_selling_price_list", False):
+                    # Create a new price list
+                    create_and_process_new_price_list(item, selling_price_list, margin_details, currency)
+                
+                elif margin_details.get("update_existing_price_list", False):
                     # Validate batch_no and date range before updating
                     if not existing_item_price.get("batch_no") and validate_date_range(
                         existing_item_price.get("valid_from"),
@@ -84,7 +92,7 @@ def get_margin_details(selling_price_list):
     return frappe.db.get_value(
         "Selling Item Price Margin",
         {"selling_price": selling_price_list},
-        ["margin_based_on", "margin_type", "margin_percentage_or_amount", "buying_price"],
+        ["margin_based_on", "margin_type", "margin_percentage_or_amount", "buying_price", "update_existing_price_list", "new_selling_price_list"],
         as_dict=True
     )
 

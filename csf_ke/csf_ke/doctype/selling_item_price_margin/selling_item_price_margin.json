@@ -12,6 +12,8 @@
   "end_date",
   "column_break_zujf",
   "disabled",
+  "new_selling_price_list",
+  "update_existing_price_list",
   "section_break_mayg",
   "selling_price",
   "column_break_lymo",
@@ -146,12 +148,24 @@
    "label": "Currency",
    "options": "Currency",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "update_existing_price_list",
+   "fieldtype": "Check",
+   "label": "Update Existing Price List"
+  },
+  {
+   "default": "1",
+   "fieldname": "new_selling_price_list",
+   "fieldtype": "Check",
+   "label": "New Selling Price List"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-09-12 20:51:57.964687",
+ "modified": "2024-11-25 19:59:07.367671",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",
