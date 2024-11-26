@@ -1,3 +1,6 @@
+[pre_model_sync]
+
+[post_model_sync]
 csf_ke.csf_ke.patches.patch_sales_invoice
 csf_ke.csf_ke.patches.patch_purchase_invoice
 csf_ke.csf_ke.patches.patch_employee
