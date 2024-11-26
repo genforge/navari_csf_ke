@@ -17,6 +17,15 @@ frappe.ui.form.on("Selling Item Price Margin", {
             frm.set_value('update_existing_price_list', 1);
         }
     },
+    margin_type: function(frm) {
+        if (frm.doc.margin_type === "Amount") {
+            frm.set_df_property('margin_percentage_or_amount', 'fieldtype', 'Currency');
+            frm.refresh_field('margin_percentage_or_amount');
+        } else if (frm.doc.margin_type === "Percentage") {
+            frm.set_df_property('margin_percentage_or_amount', 'fieldtype', 'Percent');
+            frm.refresh_field('margin_percentage_or_amount');
+        }
+    },
   onload: function (frm) {
     frm.set_query("selling_price", function () {
       return {
