@@ -25,6 +25,10 @@
  	},
     fetch_invoices: function(frm) {
 
+        frm.set_df_property('fetch_invoices', 'disabled', true);
+        
+        frappe.dom.freeze();
+
         frm.clear_table('invoices');
 
         frappe.call({
@@ -38,9 +42,18 @@
             },
             callback: function(r) {
                 frm.refresh_field('invoices');
+
+                frm.set_df_property('fetch_invoices', 'disabled', false);
+
+                frappe.dom.unfreeze();
+
             },
             error: function(err) {
                 frappe.msgprint(__('There was an error fetching invoices.'));
+
+                frm.set_df_property('fetch_invoices', 'disabled', false);
+
+                frappe.dom.unfreeze();
             }
         });
     },
