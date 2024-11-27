@@ -1,11 +1,23 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "naming_series:",
  "creation": "2024-10-08 08:30:50.441399",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "section_break_gyiq",
+  "company",
+  "from_date",
+  "to_date",
+  "column_break_gejf",
+  "selling",
+  "buying",
+  "naming_series",
+  "section_break_lbra",
+  "fetch_invoices",
+  "invoices",
+  "section_break_lvzd",
   "amended_from"
  ],
  "fields": [
@@ -22,18 +34,83 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_gejf",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_lvzd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "section_break_lbra",
+   "fieldtype": "Section Break"
+  },
+  {
+   "depends_on": "eval: doc.to_date;",
+   "fieldname": "fetch_invoices",
+   "fieldtype": "Button",
+   "label": "Fetch Invoices"
+  },
+  {
+   "fieldname": "invoices",
+   "fieldtype": "Table",
+   "label": "Invoices",
+   "options": "VAT3 Returns Invoice"
+  },
+  {
+   "fieldname": "from_date",
+   "fieldtype": "Date",
+   "label": "From Date",
+   "reqd": 1
+  },
+  {
+   "fieldname": "to_date",
+   "fieldtype": "Date",
+   "label": "To Date",
+   "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "buying",
+   "fieldtype": "Check",
+   "label": "Buying"
+  },
+  {
+   "default": "1",
+   "fieldname": "selling",
+   "fieldtype": "Check",
+   "label": "Selling"
+  },
+  {
+   "fieldname": "naming_series",
+   "fieldtype": "Select",
+   "label": "Series",
+   "options": "VAT3-.DD.-.MM.-"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-10-08 08:30:50.441399",
+ "modified": "2024-11-26 10:18:15.264659",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "VAT3 Returns",
+ "naming_rule": "By \"Naming Series\" field",
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
