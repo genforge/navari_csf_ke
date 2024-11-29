@@ -1,5 +1,8 @@
-csf_ke.csf_ke.patches.patch_sales_invoice
-csf_ke.csf_ke.patches.patch_purchase_invoice
+[pre_model_sync]
+
+[post_model_sync]
+csf_ke.csf_ke.patches.sales_invoice_patch
+csf_ke.csf_ke.patches.purchase_invoice_patch
 csf_ke.csf_ke.patches.patch_employee
 csf_ke.csf_ke.patches.job_offer_valid_date
 csf_ke.csf_ke.patches.employee_separation_type
