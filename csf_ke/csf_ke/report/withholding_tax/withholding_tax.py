@@ -46,6 +46,7 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
         for entry in details:
             tax_amount, total_amount, grand_total, base_total = 0, 0, 0, 0
             tax_withholding_category, rate = None, None
+            invoice_no, invoice_date = "", ""
             bill_no, bill_date = "", ""
             party = entry.party or entry.against
             posting_date = entry.posting_date
@@ -73,9 +74,12 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
                     # back calcalute total amount from rate and tax_amount
                     if rate:
                         total_amount = grand_total = base_total = tax_amount / (rate / 100)
+
+                    # Define amount index based on paty type
+                    amount_index = 5 if filters.get("party_type") == "Customer" else 4
                     # Use lambda to find matching bill_no where debit_amount == tax_amount
                     matching_entry = next(
-                        filter(lambda x: round(x[4]) == (tax_amount),
+                        filter(lambda x: abs(round(x[amount_index])) == (abs(tax_amount)),
                                [journal_entry_party_map.get(name)[i:i+6]
                                 for i in range(0, len(journal_entry_party_map.get(name, [])), 6)]),
                         None
@@ -85,6 +89,10 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
                             doc_info = frappe.get_doc(matching_entry[1], matching_entry[2])
                             bill_no = doc_info.bill_no
                             bill_date = doc_info.bill_date
+                        elif matching_entry[1] == "Sales Invoice":
+                            doc_info = frappe.get_doc(matching_entry[1], matching_entry[2])
+                            invoice_no = doc_info.name
+                            invoice_date = doc_info.posting_date
                     else:
                         bill_date = ""
                         bill_no = ""
@@ -127,6 +135,8 @@ def get_result(filters, tds_docs, tds_accounts, tax_category_map, journal_entry_
                         "transaction_date": posting_date,
                         "transaction_type": voucher_type,
                         "ref_no": name,
+                        "customer_invoice_no": invoice_no,
+                        "customer_invoice_date": invoice_date,
                         "supplier_invoice_no": bill_no,
                         "supplier_invoice_date": bill_date,
                     }
@@ -145,7 +155,7 @@ def get_party_pan_map(party_type):
     if party_type == "Supplier":
         fields += ["supplier_type", "supplier_name", "tax_id"]
     else:
-        fields += ["customer_type", "customer_name"]
+        fields += ["customer_type", "customer_name", "tax_id"]
 
     if frappe.db.has_column(party_type, "pan"):
         fields.append("pan")
@@ -229,6 +239,24 @@ def get_columns(filters):
                 {
                     "label": _("Supplier Invoice Date"),
                     "fieldname": "supplier_invoice_date",
+                    "fieldtype": "Date",
+                    "width": 120,
+                },
+            ]
+        )
+
+    if filters.party_type == "Customer":
+        columns.extend(
+            [
+                {
+                    "label": _("Customer Invoice No"),
+                    "fieldname": "customer_invoice_no",
+                    "fieldtype": "Data",
+                    "width": 120,
+                },
+                {
+                    "label": _("Customer Invoice Date"),
+                    "fieldname": "customer_invoice_date",
                     "fieldtype": "Date",
                     "width": 120,
                 },
