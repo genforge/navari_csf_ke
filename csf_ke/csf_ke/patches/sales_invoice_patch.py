@@ -57,6 +57,17 @@ def execute():
                 "allow_on_submit": True,
                 "translatable": 1,
                 "no_copy": 1
+            },
+            {
+                "fieldname": "is_filed",
+                "label": "Is Filed",
+                "fieldtype": "Check",
+                "collapsible": 0,
+                "insert_after": "cu_link",
+                "allow_on_submit": True,
+                "translatable": 1,
+                "no_copy": 1,
+                "read_only": 1
             }
         ]
     }
