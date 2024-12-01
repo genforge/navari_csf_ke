@@ -165,7 +165,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-25 19:59:07.367671",
+ "modified": "2024-11-29 15:26:13.458907",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",
@@ -173,6 +173,8 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "amend": 1,
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
