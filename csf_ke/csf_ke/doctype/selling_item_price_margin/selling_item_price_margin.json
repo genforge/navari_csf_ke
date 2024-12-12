@@ -26,6 +26,8 @@
   "margin_type",
   "column_break_xxgj",
   "margin_percentage_or_amount",
+  "section_break_ovfi",
+  "items",
   "section_break_hbod",
   "amended_from"
  ],
@@ -64,8 +66,7 @@
    "fieldname": "end_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "End Date",
-   "reqd": 1
+   "label": "End Date"
   },
   {
    "fieldname": "column_break_zujf",
@@ -96,7 +97,7 @@
    "fieldname": "margin_based_on",
    "fieldtype": "Select",
    "label": "Margin Based On",
-   "options": "\nBuying Price",
+   "options": "Buying Price",
    "reqd": 1
   },
   {
@@ -115,7 +116,7 @@
    "fieldname": "margin_type",
    "fieldtype": "Select",
    "label": "Margin Type",
-   "options": "\nAmount\nPercentage",
+   "options": "Amount\nPercentage",
    "reqd": 1
   },
   {
@@ -160,12 +161,22 @@
    "fieldname": "new_selling_price_list",
    "fieldtype": "Check",
    "label": "New Selling Price List"
+  },
+  {
+   "fieldname": "section_break_ovfi",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Selling Item Price Margin Item"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-29 15:26:13.458907",
+ "modified": "2024-12-12 18:22:57.376409",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",
