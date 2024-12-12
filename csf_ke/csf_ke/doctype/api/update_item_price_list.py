@@ -19,7 +19,8 @@ def update_item_prices(doc, method):
     price_list = doc.buying_price_list
 
     # Fetch margin entries based on the currency and buying price list
-    margin_entries = get_margin_entries(currency, price_list)
+    margin_entries = get_margin_entries_and_details(currency, price_list)
+    # frappe.throw(str(margin_entries))
     if not margin_entries:
         frappe.log_error(f"No margin entries found for currency {currency} and buying price list {price_list}")
         return
@@ -30,6 +31,8 @@ def update_item_prices(doc, method):
 
         # Fetch applicable margins for the item
         applicable_margins = margin_lookup.get(item.item_code, [])
+        print(f"__________________________ Applicable margins: _____________________ {str(applicable_margins)} for item {item.item_code}")
+        # frappe.throw(str(applicable_margins))
 
         if not applicable_margins:
             frappe.log_error(f"No applicable margins found for item {item.item_code}")
@@ -37,36 +40,50 @@ def update_item_prices(doc, method):
 
         for margin_entry in applicable_margins:
             selling_price_list = margin_entry['selling_price']
+            # frappe.throw(str(margin_entry))
+            print(f"selling_price_list: {selling_price_list}")
+            # frappe.throw(str(selling_price_list))
 
             # Fetch margin details for the selling price list
-            margin_details = get_margin_details(selling_price_list)
+            # margin_details = get_margin_details(selling_price_list)
+            # print(f"margin_details: {margin_details}")
+            # frappe.throw(str(margin_details))
 
-            if not margin_details:
-                frappe.log_error(f"No margin details found for selling price list {selling_price_list}")
-                continue
+            # if not margin_details:
+            #     frappe.log_error(f"No margin details found for selling price list {selling_price_list}")
+            #     continue
+
+            new_rate = calculate_new_rate(item.rate, margin_entry)
 
             # Check if the item already has an item price for the selling price list
             existing_item_price = check_existing_item_price(item.item_code, selling_price_list, item.uom)
+            # frappe.throw(str(existing_item_price))
 
             # Update or create price list based on the fetched margins
             if existing_item_price:
-                if margin_details.get("new_selling_price_list", False):
+                if margin_entry.get("new_selling_price_list", False):
                     # Create a new price list
-                    create_and_process_new_price_list(item, selling_price_list, margin_details, currency)
+                    create_and_process_new_price_list(item, selling_price_list, margin_entry, currency)
+                    print(f"____________________ Item price updated for item {item.item_code} and selling price list {selling_price_list}")
                 
-                elif margin_details.get("update_existing_price_list", False):
+                elif margin_entry.get("update_existing_price_list", False):
                     # Validate batch_no and date range before updating
                     if not existing_item_price.get("batch_no") and validate_date_range(
                         existing_item_price.get("valid_from"),
                         existing_item_price.get("valid_upto")
                     ):
-                        process_existing_price_list(item, selling_price_list, margin_details, existing_item_price['price_list_rate'])
-                else:
-                    create_and_process_new_price_list(item, selling_price_list, margin_details, currency)
+                        process_existing_price_list(item, selling_price_list, margin_entry, existing_item_price['price_list_rate'])
+                        print(f"____________________ Item price updated for item {item.item_code} and selling price list {selling_price_list}")
+            elif existing_item_price is None:
+                create_and_process_new_price_list(item, selling_price_list, margin_entry, currency)
+                print(f"____________________ Item price updated for item {item.item_code} and selling price list {selling_price_list}")
             else:
                 frappe.log_error(f"No margin details found for selling price list {selling_price_list}")
 
-def get_margin_entries(currency, price_list):
+    # frappe.throw(str(applicable_margins_res))
+    
+
+def get_margin_entries_and_details(currency, price_list):
     """
     Retrieve margin entries from Selling Item Price Margin along with items from the child table.
 
@@ -84,11 +101,16 @@ def get_margin_entries(currency, price_list):
             "currency": currency,
             "buying_price": price_list,
             "disabled": 0,
+            "docstatus": 1,
             "start_date": ["<=", date.today()],
             "end_date": [">=", date.today()]
         },
-        fields=["name", "selling_price", "buying_price"]
+        fields=["name", "selling_price", "buying_price", "margin_based_on", "margin_type", "margin_percentage_or_amount", "update_existing_price_list", "new_selling_price_list"]
     )
+
+    if not margins:
+        print(f"No margin entries found for currency {currency}, buying price list {price_list}")
+        return []
 
     # Fetch associated items for each margin
     for margin in margins:
@@ -120,22 +142,21 @@ def build_margin_lookup(margin_entries):
     
     return margin_lookup
 
-def get_margin_details(selling_price_list):
-    """
-    Retrieve margin details for a given selling price list from Selling Item Price Margin.
+# def get_margin_details(selling_price_list):
+#     """
+#     Retrieve margin details for a given selling price list from Selling Item Price Margin.
 
-    Args:
-        selling_price_list (str): The selling price list to fetch margin details for.
+#     Args:
+#         selling_price_list (str): The selling price list to fetch margin details for.
 
-    Returns:
-        dict: Dictionary containing margin details or None if not found.
-    """
-    return frappe.db.get_value(
-        "Selling Item Price Margin",
-        {"selling_price": selling_price_list},
-        ["margin_based_on", "margin_type", "margin_percentage_or_amount", "buying_price", "update_existing_price_list", "new_selling_price_list"],
-        as_dict=True
-    )
+#     Returns:
+#         dict: Dictionary containing margin details or None if not found.
+#     """
+#     return frappe.get_all(
+#         "Selling Item Price Margin",
+#         {"selling_price": selling_price_list, "disabled": 0, "docstatus": 1},
+#         ["margin_based_on", "margin_type", "margin_percentage_or_amount", "buying_price", "update_existing_price_list", "new_selling_price_list"]
+#     )
 
 def check_existing_item_price(item_code, price_list, uom):
     """
