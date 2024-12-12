@@ -8,7 +8,7 @@ from frappe.model.document import Document
 
 class SellingItemPriceMargin(Document):
 
-    def before_submit(self):
+    def before_save(self):
 
         self.check_date_overlap()
 
@@ -23,17 +23,24 @@ class SellingItemPriceMargin(Document):
                 "start_date": ("<=", self.start_date),
                 "end_date": (">=", self.end_date),
             },
-            fields=["selling_price", "start_date", "end_date"],
+            fields=["name", "selling_price", "start_date", "end_date"],
         )
 
-        if existing_records:
-            overlap_details = [
-                _("Selling price: {0} (From: {1}, To: {2})").format(
-                    rec["selling_price"], rec["start_date"], rec["end_date"]
-                )
-                for rec in existing_records
-            ]
-            frappe.throw(
-                _("Date overlap exists for the same selling price with the following records:\n{0}")
-                .format("\n".join(overlap_details))
-            )
+        items = [item.item_code for item in self.items if self.items]
+        
+        for record in existing_records:
+
+            sipm = frappe.get_doc("Selling Item Price Margin", record.name)
+
+            for item in sipm.items:
+                if item.item_code in items:
+                    overlap_details = _("Selling price: {0} (From: {1}, To: {2})").format(
+                        record["selling_price"], record["start_date"], record["end_date"]
+                    )
+                    frappe.throw(
+                        _("Item '{0}' already exists in another record with the same selling price. Date overlap:\n{1}").format(
+                            item.item_code, overlap_details
+                        )
+                    )
+                else:
+                    continue
