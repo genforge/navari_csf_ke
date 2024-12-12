@@ -105,7 +105,8 @@
    "fieldname": "buying_price",
    "fieldtype": "Link",
    "label": "Buying Price",
-   "options": "Price List"
+   "options": "Price List",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_ozli",
@@ -176,7 +177,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-12 18:22:57.376409",
+ "modified": "2024-12-12 20:54:17.817519",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",
