@@ -88,7 +88,6 @@ def get_margin_entries_and_details(currency, price_list):
     )
 
     if not margins:
-        print(f"No margin entries found for currency {currency}, buying price list {price_list}")
         return []
 
     # Fetch associated items for each margin

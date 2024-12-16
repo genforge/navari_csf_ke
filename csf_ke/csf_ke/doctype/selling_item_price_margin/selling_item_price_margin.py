@@ -12,12 +12,31 @@ class SellingItemPriceMargin(Document):
 
         self.check_date_overlap()
 
+    def on_update(self):
+
+        self.check_date_overlap()
+
+    def on_update_after_submit(self):
+
+        self.check_date_overlap()
+
     def check_date_overlap(self):
+
+        item_codes = [item.item_code for item in self.items]
+        duplicate_items = [item for item in set(item_codes) if item_codes.count(item) > 1]
+
+        if duplicate_items:
+            frappe.throw(
+                title=_("Duplicate Items"),
+                msg=_("{0}").format(", ".join(duplicate_items)),
+                exc=frappe.DuplicateEntryError,
+            )
 
         existing_records = frappe.get_all(
             "Selling Item Price Margin",
             filters={
                 "docstatus": 1,
+                "disabled": 0,
                 "selling_price": self.selling_price,
                 "name": ("!=", self.name),
                 "start_date": ("<=", self.start_date),

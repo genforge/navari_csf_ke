@@ -52,6 +52,7 @@
    "label": "Duration"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "start_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -63,6 +64,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "end_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -121,6 +123,7 @@
    "reqd": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "margin_percentage_or_amount",
    "fieldtype": "Currency",
    "label": "Margin Percentage or Amount",
@@ -168,6 +171,8 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_bulk_edit": 1,
+   "allow_on_submit": 1,
    "fieldname": "items",
    "fieldtype": "Table",
    "label": "Items",
@@ -177,7 +182,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-12-12 20:54:17.817519",
+ "modified": "2024-12-16 12:20:23.161007",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",
@@ -202,5 +207,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
