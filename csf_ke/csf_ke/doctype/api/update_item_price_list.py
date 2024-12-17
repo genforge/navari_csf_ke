@@ -37,29 +37,34 @@ def update_item_prices(doc, method):
 
         for margin_entry in applicable_margins:
             selling_price_list = margin_entry['selling_price']
+            price_list_action = margin_entry['price_list_action']
+
+            if not price_list_action:
+                frappe.log_error(f"Price list action not specified for item {item.item_code}")
+                continue
 
             new_rate = calculate_new_rate(item.rate, margin_entry)
 
             # Check if the item already has an item price for the selling price list
             existing_item_price = check_existing_item_price(item.item_code, selling_price_list, item.uom)
 
-            # Update or create price list based on the fetched margins
-            if existing_item_price:
-                if margin_entry.get("new_selling_price_list", False):
-                    # Create a new price list
-                    create_and_process_new_price_list(item, selling_price_list, margin_entry, currency)
-                
-                elif margin_entry.get("update_existing_price_list", False):
+            if price_list_action == "New Selling Price List":
+                # Always create a new price list
+                create_and_process_new_price_list(item, selling_price_list, margin_entry, currency)
+
+            elif price_list_action == "Update Existing Price List":
+                if existing_item_price:
                     # Validate batch_no and date range before updating
                     if not existing_item_price.get("batch_no") and validate_date_range(
                         existing_item_price.get("valid_from"),
                         existing_item_price.get("valid_upto")
                     ):
                         process_existing_price_list(item, selling_price_list, margin_entry, existing_item_price['price_list_rate'])
-            elif existing_item_price is None:
-                create_and_process_new_price_list(item, selling_price_list, margin_entry, currency)
+                else:
+                    frappe.log_error(f"No existing item price found for item {item.item_code} in selling price list {selling_price_list}")
+
             else:
-                frappe.log_error(f"No margin details found for selling price list {selling_price_list}")
+                frappe.log_error(f"Unsupported price list action {price_list_action} for item {item.item_code}")
     
 
 def get_margin_entries_and_details(currency, price_list):
@@ -84,7 +89,7 @@ def get_margin_entries_and_details(currency, price_list):
             "start_date": ["<=", date.today()],
             "end_date": [">=", date.today()]
         },
-        fields=["name", "selling_price", "buying_price", "margin_based_on", "margin_type", "margin_percentage_or_amount", "update_existing_price_list", "new_selling_price_list"]
+        fields=["name", "selling_price", "buying_price", "margin_based_on", "margin_type", "margin_percentage_or_amount", "price_list_action"]
     )
 
     if not margins:
