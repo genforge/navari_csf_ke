@@ -11,14 +11,27 @@ class SellingItemPriceMargin(Document):
     def before_save(self):
 
         self.check_date_overlap()
+        self.validate_margin_field()
 
     def on_update(self):
 
         self.check_date_overlap()
+        self.validate_margin_field()
 
     def on_update_after_submit(self):
 
         self.check_date_overlap()
+        self.validate_margin_field()
+
+    def validate_margin_field(self):
+
+        if self.margin_type == "Amount":
+            if self.margin_percentage_or_amount < 0:
+                frappe.throw(_("Margin Amount cannot be negative."))
+
+        elif self.margin_type == "Percentage":
+            if self.margin_percentage_or_amount < 0 or self.margin_percentage_or_amount > 100:
+                frappe.throw(_("Margin Percentage must be between 0 and 100."))
 
     def check_date_overlap(self):
 
