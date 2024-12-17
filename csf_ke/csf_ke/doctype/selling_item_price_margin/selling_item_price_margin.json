@@ -12,8 +12,8 @@
   "end_date",
   "column_break_zujf",
   "disabled",
-  "new_selling_price_list",
-  "update_existing_price_list",
+  "section_break_sakr",
+  "price_list_action",
   "section_break_mayg",
   "selling_price",
   "column_break_lymo",
@@ -26,6 +26,8 @@
   "margin_type",
   "column_break_xxgj",
   "margin_percentage_or_amount",
+  "section_break_ovfi",
+  "items",
   "section_break_hbod",
   "amended_from"
  ],
@@ -50,6 +52,7 @@
    "label": "Duration"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "start_date",
    "fieldtype": "Date",
    "in_list_view": 1,
@@ -61,11 +64,11 @@
    "fieldtype": "Column Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "end_date",
    "fieldtype": "Date",
    "in_list_view": 1,
-   "label": "End Date",
-   "reqd": 1
+   "label": "End Date"
   },
   {
    "fieldname": "column_break_zujf",
@@ -96,7 +99,7 @@
    "fieldname": "margin_based_on",
    "fieldtype": "Select",
    "label": "Margin Based On",
-   "options": "\nBuying Price",
+   "options": "Buying Price",
    "reqd": 1
   },
   {
@@ -104,7 +107,8 @@
    "fieldname": "buying_price",
    "fieldtype": "Link",
    "label": "Buying Price",
-   "options": "Price List"
+   "options": "Price List",
+   "reqd": 1
   },
   {
    "fieldname": "section_break_ozli",
@@ -115,10 +119,11 @@
    "fieldname": "margin_type",
    "fieldtype": "Select",
    "label": "Margin Type",
-   "options": "\nAmount\nPercentage",
+   "options": "Amount\nPercentage",
    "reqd": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "margin_percentage_or_amount",
    "fieldtype": "Currency",
    "label": "Margin Percentage or Amount",
@@ -150,22 +155,34 @@
    "reqd": 1
   },
   {
-   "default": "0",
-   "fieldname": "update_existing_price_list",
-   "fieldtype": "Check",
-   "label": "Update Existing Price List"
+   "fieldname": "section_break_ovfi",
+   "fieldtype": "Section Break"
   },
   {
-   "default": "1",
-   "fieldname": "new_selling_price_list",
-   "fieldtype": "Check",
-   "label": "New Selling Price List"
+   "allow_bulk_edit": 1,
+   "allow_on_submit": 1,
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Selling Item Price Margin Item"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "price_list_action",
+   "fieldtype": "Select",
+   "label": "Price List Action",
+   "options": "New Selling Price List\nUpdate Existing Price List"
+  },
+  {
+   "fieldname": "section_break_sakr",
+   "fieldtype": "Section Break",
+   "label": "Price List Action"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-29 15:26:13.458907",
+ "modified": "2024-12-17 12:02:20.417949",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Selling Item Price Margin",
@@ -190,5 +207,6 @@
  ],
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "track_changes": 1
 }
