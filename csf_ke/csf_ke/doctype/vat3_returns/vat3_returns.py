@@ -25,8 +25,8 @@ class VAT3Returns(Document):
         }
 
         for invoice in self.invoices:
-            if invoice.document_type in doctype_map:
-                invoice_doc = frappe.get_doc(doctype_map[invoice.document_type], invoice.invoice_number)
+            if invoice.invoice_type in doctype_map:
+                invoice_doc = frappe.get_doc(doctype_map[invoice.invoice_type], invoice.invoice_number)
                 invoice_doc.is_filed = is_filed
                 invoice_doc.save()
 
@@ -112,7 +112,7 @@ class VAT3Returns(Document):
                 tax_rate = self.get_tax_rate(item, invoice)
 
                 self.append("invoices", {
-                    "document_type": invoice_type,
+                    "invoice_type": invoice_type,
                     "invoice_number": invoice.name,
                     "invoice_date": invoice.posting_date,
                     "taxable_value": item.net_amount,
