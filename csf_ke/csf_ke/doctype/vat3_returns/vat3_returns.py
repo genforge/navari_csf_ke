@@ -66,7 +66,7 @@ class VAT3Returns(Document):
 
 
     @frappe.whitelist()
-    def fetch_invoices(self, invoice_type, from_date, to_date, company):
+    def fetch_invoices(self, invoice_type, from_date, to_date, company, tax_template=None):
 
         etr_field = "etr_serial_number" if invoice_type == "Sales Invoice" else "etr_invoice_number"
         party_field = "customer" if invoice_type == "Sales Invoice" else "supplier"
@@ -75,7 +75,6 @@ class VAT3Returns(Document):
             invoice_type,
             filters={
                 "docstatus": 1,
-                "is_return": 0,
                 "posting_date": ["between", [from_date, to_date]],
                 "company": company,
                 "is_filed": 0
@@ -86,7 +85,9 @@ class VAT3Returns(Document):
                 "total", 
                 "tax_id", 
                 etr_field,
-                party_field
+                party_field,
+                "is_return",
+                "return_against"
             ],
             order_by="posting_date desc"
         )
@@ -99,8 +100,14 @@ class VAT3Returns(Document):
         for invoice_data in invoices:
 
             invoice = frappe.get_doc(invoice_type, invoice_data.name)
+            is_return = invoice.is_return
+            credit_note_number = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "etr_invoice_number")
+            credit_note_date = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "cu_invoice_date")
 
             for item in invoice.items:
+
+                if tax_template and item.get("item_tax_template") != tax_template:
+                    continue
 
                 tax_rate = self.get_tax_rate(item, invoice)
 
@@ -113,6 +120,8 @@ class VAT3Returns(Document):
                     "tax_rate": tax_rate,
                     "etr_serial_number": invoice.get(etr_field),
                     "supplier_name": invoice.get(party_field),
+                    "cu_inv": credit_note_number,
+                    "cu_date": credit_note_date
                 })
 
         frappe.msgprint(_("Invoices fetched successfully"))
