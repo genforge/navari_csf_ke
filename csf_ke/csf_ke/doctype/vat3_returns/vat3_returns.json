@@ -11,9 +11,10 @@
   "from_date",
   "to_date",
   "column_break_gejf",
-  "selling",
-  "buying",
+  "return_type",
   "naming_series",
+  "return_type_section",
+  "tax_template",
   "section_break_lbra",
   "fetch_invoices",
   "invoices",
@@ -80,28 +81,35 @@
    "reqd": 1
   },
   {
-   "default": "0",
-   "fieldname": "buying",
-   "fieldtype": "Check",
-   "label": "Buying"
-  },
-  {
-   "default": "1",
-   "fieldname": "selling",
-   "fieldtype": "Check",
-   "label": "Selling"
-  },
-  {
    "fieldname": "naming_series",
    "fieldtype": "Select",
    "label": "Series",
    "options": "VAT3-.DD.-.MM.-"
+  },
+  {
+   "default": "Selling",
+   "fieldname": "return_type",
+   "fieldtype": "Select",
+   "label": "Return Type",
+   "options": "Selling\nBuying",
+   "reqd": 1
+  },
+  {
+   "fieldname": "return_type_section",
+   "fieldtype": "Section Break",
+   "label": "Tax Type"
+  },
+  {
+   "fieldname": "tax_template",
+   "fieldtype": "Link",
+   "label": "Tax Template",
+   "options": "Item Tax Template"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2024-11-26 10:18:15.264659",
+ "modified": "2024-12-18 17:26:52.921193",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "VAT3 Returns",
