@@ -2,20 +2,6 @@
 // For license information, please see license.txt
 
  frappe.ui.form.on("VAT3 Returns", {
- 	buying: function(frm) {
- 	    if (frm.doc.buying) {
- 	        frm.set_value('selling', 0);
- 	    } else {
-            frm.set_value('selling', 1);
-        }
- 	},
- 	selling: function(frm) {
- 	    if (frm.doc.selling) {
- 	        frm.set_value('buying', 0);
- 	    } else {
-            frm.set_value('buying', 1);
-        }
- 	},
  	from_date: function(frm){
  	    if (frm.doc.from_date) {
  	        let fromDate = new Date(frm.doc.from_date);
@@ -35,10 +21,11 @@
             method: 'fetch_invoices',
             doc: frm.doc,
             args: {
-                invoice_type: frm.doc.selling ? "Sales Invoice" : "Purchase Invoice",
+                invoice_type: frm.doc.return_type == "Selling" ? "Sales Invoice" : "Purchase Invoice",
                 from_date: frm.doc.from_date,
                 to_date: frm.doc.to_date,
-                company: frm.doc.company
+                company: frm.doc.company,
+                tax_template: frm.doc.tax_template || null
             },
             callback: function(r) {
                 frm.refresh_field('invoices');
