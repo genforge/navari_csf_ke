@@ -101,32 +101,51 @@ class VAT3Returns(Document):
 
             invoice = frappe.get_doc(invoice_type, invoice_data.name)
             is_return = invoice.is_return
-            credit_note_number = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "etr_invoice_number")
+            credit_note_number = (
+                invoice.return_against
+                and frappe.get_value(invoice_type, invoice.return_against, "etr_invoice_number")
+            )
+            credit_note_date = (
+                invoice.return_against
+                and frappe.get_value(
+                    invoice_type,
+                    invoice.return_against,
+                    "cu_invoice_date" if invoice_type == "Sales Invoice" else "bill_date"
+                )
+            )
 
-            if invoice_type == "Sales Invoice":
-                credit_note_date = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "cu_invoice_date")
-            elif invoice_type == "Purchase Invoice":
-                credit_note_date = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "bill_date")
-
+            # Group items by tax template
+            grouped_items = {}
             for item in invoice.items:
+
+                item_tax_template = item.get("item_tax_template", "No Tax Template")
 
                 if tax_template and item.get("item_tax_template") != tax_template:
                     continue
 
-                tax_rate = self.get_tax_rate(item, invoice)
+                if item_tax_template not in grouped_items:
+                    grouped_items[item_tax_template] = {
+                        "taxable_value": 0,
+                        "tax_rate": self.get_tax_rate(item, invoice)
+                    }
+
+                grouped_items[item_tax_template]["taxable_value"] += item.net_amount
+            
+            for tax_template_group, data in grouped_items.items():
 
                 self.append("invoices", {
                     "invoice_type": invoice_type,
                     "invoice_number": invoice.name,
                     "invoice_date": invoice.posting_date,
-                    "taxable_value": item.net_amount,
+                    "taxable_value": data["taxable_value"],
                     "pin_number": invoice.tax_id,
-                    "tax_rate": tax_rate,
+                    "tax_rate": data["tax_rate"],
                     "etr_serial_number": invoice.etr_serial_number if invoice_type == "Sales Invoice" else "",
                     "etr_invoice_number": invoice.etr_invoice_number,
                     "supplier_name": invoice.get(party_field),
                     "cu_inv": credit_note_number,
-                    "cu_date": credit_note_date
+                    "cu_date": credit_note_date,
+                    "tax_template": tax_template_group
                 })
 
         frappe.msgprint(_("Invoices fetched successfully"))
