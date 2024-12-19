@@ -81,7 +81,19 @@ class KenyaPurchaseTaxReport(object):
                     "fieldtype": "Link",
                     "options": "Purchase Invoice",
                     "width": 200,
-                }
+                },
+                {
+					"label": _("Return CU Invoice Number"),
+					"fieldname": "return_cu_invoice_number",
+					"fieldtype": "Data",
+					"width": 200
+				},
+				{
+					"label": _("Return CU Invoice Date"),
+					"fieldname": "return_cu_invoice_date",
+					"fieldtype": "Date",
+					"width": 160
+				}
             ]
         return columns
 
@@ -136,6 +148,19 @@ class KenyaPurchaseTaxReport(object):
             )
 
         purchase_invoices = purchase_invoices_query.run(as_dict=True)
+
+        for invoice in purchase_invoices:
+            if invoice.get('return_against'):
+                return_invoice_details = frappe.db.get_value(
+                    'Purchase Invoice',
+                    invoice['return_against'],
+                    ['etr_invoice_number', 'bill_date'],
+                    as_dict=True
+                )
+                if return_invoice_details:
+                    invoice['return_cu_invoice_number'] = return_invoice_details.get('etr_invoice_number')
+                    invoice['return_cu_invoice_date'] = return_invoice_details.get('bill_date')
+
         return purchase_invoices
 
     def get_purchase_invoice_items(self, purchase_invoice_name, tax_template=None):
