@@ -96,6 +96,18 @@ class KenyaSalesTaxReport(object):
 					"fieldtype": "Link",
 					"options": "Sales Invoice",
 					"width": 200
+				},
+				{
+					"label": _("Return CU Invoice Number"),
+					"fieldname": "return_cu_invoice_number",
+					"fieldtype": "Data",
+					"width": 200
+				},
+				{
+					"label": _("Return CU Invoice Date"),
+					"fieldname": "return_cu_invoice_date",
+					"fieldtype": "Date",
+					"width": 160
 				}
 			]
 
@@ -138,6 +150,19 @@ class KenyaSalesTaxReport(object):
 			sales_invoice_query = sales_invoice_query.where(sale_invoice_doc.posting_date <= to_date)
 
 		sales_invoices = sales_invoice_query.run(as_dict=True)
+		
+		for invoice in sales_invoices:
+			if invoice.get('return_against'):
+				return_invoice_details = frappe.db.get_value(
+					'Sales Invoice',
+					invoice['return_against'],
+					['etr_invoice_number', 'cu_invoice_date'],
+					as_dict=True
+				)
+				if return_invoice_details:
+					invoice['return_cu_invoice_number'] = return_invoice_details.get('etr_invoice_number')
+					invoice['return_cu_invoice_date'] = return_invoice_details.get('cu_invoice_date')
+
 		return sales_invoices
 
 	def get_sales_invoice_items(self, sales_invoice_name, tax_template=None):
