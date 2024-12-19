@@ -68,7 +68,6 @@ class VAT3Returns(Document):
     @frappe.whitelist()
     def fetch_invoices(self, invoice_type, from_date, to_date, company, tax_template=None):
 
-        etr_field = "etr_serial_number" if invoice_type == "Sales Invoice" else "etr_invoice_number"
         party_field = "customer" if invoice_type == "Sales Invoice" else "supplier"
 
         invoices =  frappe.get_all(
@@ -83,8 +82,9 @@ class VAT3Returns(Document):
                 "name", 
                 "posting_date", 
                 "total", 
-                "tax_id", 
-                etr_field,
+                "tax_id",
+                "etr_serial_number" if invoice_type == "Sales Invoice" else "etr_invoice_number",
+                "etr_invoice_number",
                 party_field,
                 "is_return",
                 "return_against"
@@ -102,7 +102,11 @@ class VAT3Returns(Document):
             invoice = frappe.get_doc(invoice_type, invoice_data.name)
             is_return = invoice.is_return
             credit_note_number = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "etr_invoice_number")
-            credit_note_date = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "cu_invoice_date")
+
+            if invoice_type == "Sales Invoice":
+                credit_note_date = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "cu_invoice_date")
+            elif invoice_type == "Purchase Invoice":
+                credit_note_date = invoice.return_against and frappe.get_value(invoice_type, invoice.return_against, "bill_date")
 
             for item in invoice.items:
 
@@ -118,7 +122,8 @@ class VAT3Returns(Document):
                     "taxable_value": item.net_amount,
                     "pin_number": invoice.tax_id,
                     "tax_rate": tax_rate,
-                    "etr_serial_number": invoice.get(etr_field),
+                    "etr_serial_number": invoice.etr_serial_number if invoice_type == "Sales Invoice" else "",
+                    "etr_invoice_number": invoice.etr_invoice_number,
                     "supplier_name": invoice.get(party_field),
                     "cu_inv": credit_note_number,
                     "cu_date": credit_note_date
