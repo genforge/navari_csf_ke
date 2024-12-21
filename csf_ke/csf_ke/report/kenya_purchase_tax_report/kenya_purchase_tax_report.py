@@ -71,6 +71,18 @@ class KenyaPurchaseTaxReport(object):
                 "fieldtype": "Currency",
                 "width": 160,
             },
+            {
+                "label": _("Return CU Invoice Number"),
+                "fieldname": "return_cu_invoice_number",
+                "fieldtype": "Data",
+                "width": 200
+            },
+            {
+                "label": _("Return CU Invoice Date"),
+                "fieldname": "return_cu_invoice_date",
+                "fieldtype": "Date",
+                "width": 160
+            }
         ]
 
         if self.filters.is_return == "Is Return":
@@ -81,19 +93,7 @@ class KenyaPurchaseTaxReport(object):
                     "fieldtype": "Link",
                     "options": "Purchase Invoice",
                     "width": 200,
-                },
-                {
-					"label": _("Return CU Invoice Number"),
-					"fieldname": "return_cu_invoice_number",
-					"fieldtype": "Data",
-					"width": 200
-				},
-				{
-					"label": _("Return CU Invoice Date"),
-					"fieldname": "return_cu_invoice_date",
-					"fieldtype": "Date",
-					"width": 160
-				}
+                }
             ]
         return columns
 

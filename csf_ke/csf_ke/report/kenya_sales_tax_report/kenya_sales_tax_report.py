@@ -85,17 +85,6 @@ class KenyaSalesTaxReport(object):
 					"fieldname": "amount_of_vat",
 					"fieldtype": "Currency",
 					"width": 160
-				}
-		]
-
-		if self.filters.is_return == "Is Return":
-			columns += [
-				{
-					"label": _("Return Against"),
-					"fieldname": "return_against",
-					"fieldtype": "Link",
-					"options": "Sales Invoice",
-					"width": 200
 				},
 				{
 					"label": _("Return CU Invoice Number"),
@@ -108,6 +97,17 @@ class KenyaSalesTaxReport(object):
 					"fieldname": "return_cu_invoice_date",
 					"fieldtype": "Date",
 					"width": 160
+				}
+		]
+
+		if self.filters.is_return == "Is Return":
+			columns += [
+				{
+					"label": _("Return Against"),
+					"fieldname": "return_against",
+					"fieldtype": "Link",
+					"options": "Sales Invoice",
+					"width": 200
 				}
 			]
 
