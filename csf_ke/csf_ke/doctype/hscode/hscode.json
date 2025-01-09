@@ -1,5 +1,6 @@
 {
  "actions": [],
+ "allow_import": 1,
  "allow_rename": 1,
  "autoname": "format:{hscode}",
  "creation": "2025-01-09 12:27:31.827636",
@@ -75,7 +76,7 @@
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-09 15:39:47.089093",
+ "modified": "2025-01-09 16:24:08.422749",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "HSCode",
@@ -95,7 +96,9 @@
    "write": 1
   }
  ],
+ "search_fields": "hscode, item_tax, description",
  "sort_field": "modified",
  "sort_order": "DESC",
- "states": []
+ "states": [],
+ "title_field": "hscode"
 }
