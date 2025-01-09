@@ -45,6 +45,9 @@ fixtures = [
             ]
         ],
     },
+    {
+        "doctype": "HSCode",
+    },
 ]
 
 # Includes in <head>
