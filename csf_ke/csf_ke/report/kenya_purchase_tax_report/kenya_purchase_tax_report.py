@@ -123,7 +123,7 @@ class KenyaPurchaseTaxReport(object):
                 purchase_invoice_.base_grand_total.as_("invoice_total_purchases"),
                 purchase_invoice_.return_against.as_("return_against"),
             )
-            .where(purchase_invoice_.status != "Cancelled")
+            .where(purchase_invoice_.docstatus == 1)
         )
 
         if company:
