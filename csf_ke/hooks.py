@@ -30,7 +30,7 @@ fixtures = [
                     "Employee-tax_id",
                     "Salary Component-p9a_tax_deduction_card_type",
                     "Item Tax-custom_column_break",
-                    "Item Tax-custom_hscode",
+                    "Item Tax-custom_tims_hscode",
                     "Item Tax-custom_section_break_k5uid",
                     "Item Tax-custom_description",
                 ),
