@@ -46,5 +46,37 @@ frappe.query_reports["Kenya Sales Tax Report"] = {
 			"reqd": 0,
 			"width": "100px"
 		}
-	]
+	],
+    "onload": function(report) {
+        report.page.add_action_icon('bi bi-download', function() {
+            // frappe.msgprint(__('This is a custom action!!!'))
+            frappe.call({
+                method: "csf_ke.csf_ke.report.kenya_sales_tax_report.kenya_sales_tax_report.download_custom_csv_format",
+                args: {
+                    company: report.get_filter_value("company"),
+                    from_date: report.get_filter_value("from_date"),
+                    to_date: report.get_filter_value("to_date")
+                },
+                callback: function(response) {
+                    if (response.message) {
+                        const fileLinks = Object.entries(response.message).map(([template, fileUrl]) => {
+                            return `<a href="${fileUrl}" target="_blank">${template} Sales Report</a>`;
+                        });
+
+                        // Display links in a modal
+                        frappe.msgprint({
+                            title: __('CSV Download Links'),
+                            message: fileLinks.join('<br>'),
+                            indicator: 'green'
+                        });
+                    } else {
+                        frappe.msgprint(__('No files were generated'));
+                    }
+                },
+                error: function() {
+                    frappe.msgprint(__('An error occured while generating the CSV files.'));
+                }
+            });
+        });
+    }
 };

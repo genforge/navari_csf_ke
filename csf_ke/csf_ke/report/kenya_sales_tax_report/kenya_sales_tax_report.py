@@ -4,6 +4,9 @@
 from __future__ import unicode_literals
 import frappe
 from frappe import _
+import os
+import csv
+from frappe.utils import get_url
 
 def execute(filters=None):
 	return KenyaSalesTaxReport(filters).run()
@@ -248,3 +251,84 @@ class KenyaSalesTaxReport(object):
 			"datatype": "Currency",
 			"currency": "KES"
 		}]
+
+@frappe.whitelist()
+def download_custom_csv_format(company, from_date, to_date):
+    # Directory for public files
+    public_path = frappe.utils.get_site_path('public', 'files', 'sales_report_files')
+    os.makedirs(public_path, exist_ok=True)
+
+    # Define tax templates for VAT 16%, Exempt, Zero-Rated
+    tax_templates = {
+        "VAT 16%": "VAT 16% - CIL",
+        "Exempt": "Exempt - CIL",
+        "Zero-Rated": "Zero Rated - CIL"
+    }
+
+    # Initialize a dictionary to hold the file paths
+    csv_files = {}
+
+    for template_name, tax_template in tax_templates.items():
+        # Use `get_sales_invoices` function to fetch filtered data
+        sales_invoices = KenyaSalesTaxReport({
+            "company": company,
+            "from_date": from_date,
+            "to_date": to_date,
+            "tax_template": tax_template
+        }).get_data()
+
+        if sales_invoices:
+            # Define the file name and path
+            csv_file_name = f"{template_name.replace(' ', '_').lower()}_sales_report.csv"
+            full_file_path = os.path.join(public_path, csv_file_name)
+
+            # Write data to the CSV file
+            with open(full_file_path, 'w', newline='') as csvfile:
+                writer = csv.writer(csvfile)
+                # Write the headers
+                writer.writerow([
+                    "PIN of Purchaser",
+                    "Name of Purchaser",
+                    "ETR Serial Number",
+                    "ETR Invoice Number",
+                    "CU Link",
+                    "CU Invoice Date",
+                    "Invoice Date",
+                    "Invoice Name",
+                    "Invoice Total Sales",
+                    "Return Against"
+                ])
+
+                # Write the data rows
+                for invoice in sales_invoices:
+                    writer.writerow([
+                        invoice.get('pin_of_purchaser', ''),
+                        invoice.get('name_of_purchaser', ''),
+                        invoice.get('etr_serial_number', ''),
+                        f"|{(invoice.get('etr_invoice_number', ''))}",
+                        invoice.get('cu_link', ''),
+                        invoice.get('cu_invoice_date', ''),
+                        invoice.get('invoice_date', ''),
+                        invoice.get('invoice_name', ''),
+                        invoice.get('invoice_total_sales', ''),
+                        invoice.get('return_against', '')
+                    ])
+					
+            # Create a file record in the File table
+            file_record = frappe.get_doc({
+                "doctype": "File",
+                "file_name": csv_file_name,
+                "file_url": f"/files/sales_report_files/{csv_file_name}",
+                "attached_to_name": company,
+                "attached_to_doctype": "Sales Invoice",
+                "file_size": os.path.getsize(full_file_path),
+                "is_private": 0,
+                "file_type": "CSV",
+            })
+            file_record.insert()
+
+            # Store the file path for reference
+            csv_files[template_name] = f"/files/sales_report_files/{csv_file_name}"
+
+    # Return the file paths for download
+    return csv_files
