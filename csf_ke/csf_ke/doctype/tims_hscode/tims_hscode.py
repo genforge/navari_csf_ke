@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class HSCode(Document):
+class TIMsHSCode(Document):
 	pass

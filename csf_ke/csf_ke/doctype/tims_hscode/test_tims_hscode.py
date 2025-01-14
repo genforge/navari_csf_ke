@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestHSCode(FrappeTestCase):
+class TestTIMsHSCode(FrappeTestCase):
 	pass

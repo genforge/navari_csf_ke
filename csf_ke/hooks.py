@@ -50,7 +50,7 @@ fixtures = [
         ],
     },
     {
-        "doctype": "HSCode",
+        "doctype": "TIMs HSCode",
     },
 ]
 
