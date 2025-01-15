@@ -6,7 +6,8 @@ import frappe
 from frappe import _
 import os
 import csv
-from frappe.utils import get_url
+import re
+from datetime import datetime
 
 def execute(filters=None):
 	return KenyaSalesTaxReport(filters).run()
@@ -254,81 +255,82 @@ class KenyaSalesTaxReport(object):
 
 @frappe.whitelist()
 def download_custom_csv_format(company, from_date, to_date):
-    # Directory for public files
-    public_path = frappe.utils.get_site_path('public', 'files', 'sales_report_files')
-    os.makedirs(public_path, exist_ok=True)
+	
+    from_date_str = from_date.strftime("%Y-%m-%d") if isinstance(from_date, datetime) else from_date
+    to_date_str = to_date.strftime("%Y-%m-%d") if isinstance(to_date, datetime) else to_date
 
-    # Define tax templates for VAT 16%, Exempt, Zero-Rated
-    tax_templates = {
-        "VAT 16%": "VAT 16% - CIL",
-        "Exempt": "Exempt - CIL",
-        "Zero-Rated": "Zero Rated - CIL"
-    }
+    private_path = frappe.utils.get_site_path('private', 'files', 'sales_report_files')
+    os.makedirs(private_path, exist_ok=True)
 
-    # Initialize a dictionary to hold the file paths
+    tax_templates = [
+        "VAT 16%",
+        "Exempt",
+        "Zero-Rated"
+    ]
+    
     csv_files = {}
 
-    for template_name, tax_template in tax_templates.items():
-        # Use `get_sales_invoices` function to fetch filtered data
-        sales_invoices = KenyaSalesTaxReport({
-            "company": company,
-            "from_date": from_date,
-            "to_date": to_date,
-            "tax_template": tax_template
-        }).get_data()
+    for template_name in tax_templates:
+        
+        pattern = re.compile(rf"{re.escape(template_name)}[\s\-_]*[\d\%]*", re.IGNORECASE)
 
-        if sales_invoices:
-            # Define the file name and path
-            csv_file_name = f"{template_name.replace(' ', '_').lower()}_sales_report.csv"
-            full_file_path = os.path.join(public_path, csv_file_name)
+        all_tax_templates = frappe.get_all('Item Tax Template', fields=['name'])
 
-            # Write data to the CSV file
-            with open(full_file_path, 'w', newline='') as csvfile:
-                writer = csv.writer(csvfile)
-                # Write the headers
-                writer.writerow([
-                    "PIN of Purchaser",
-                    "Name of Purchaser",
-                    "ETR Serial Number",
-                    "ETR Invoice Number",
-                    "CU Link",
-                    "CU Invoice Date",
-                    "Invoice Date",
-                    "Invoice Name",
-                    "Invoice Total Sales",
-                    "Return Against"
-                ])
+        for template in all_tax_templates:
+            match = pattern.match(template['name'])
+            if match:
+                company_name = match.group(0)
+                
+                sales_invoices = KenyaSalesTaxReport({
+                    "company": company,
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "tax_template": template['name']
+                }).get_data()
 
-                # Write the data rows
-                for invoice in sales_invoices:
-                    writer.writerow([
-                        invoice.get('pin_of_purchaser', ''),
-                        invoice.get('name_of_purchaser', ''),
-                        invoice.get('etr_serial_number', ''),
-                        f"|{(invoice.get('etr_invoice_number', ''))}",
-                        invoice.get('cu_link', ''),
-                        invoice.get('cu_invoice_date', ''),
-                        invoice.get('invoice_date', ''),
-                        invoice.get('invoice_name', ''),
-                        invoice.get('invoice_total_sales', ''),
-                        invoice.get('return_against', '')
-                    ])
-					
-            # Create a file record in the File table
-            file_record = frappe.get_doc({
-                "doctype": "File",
-                "file_name": csv_file_name,
-                "file_url": f"/files/sales_report_files/{csv_file_name}",
-                "attached_to_name": company,
-                "attached_to_doctype": "Sales Invoice",
-                "file_size": os.path.getsize(full_file_path),
-                "is_private": 0,
-                "file_type": "CSV",
-            })
-            file_record.insert()
+                if sales_invoices:
+                    csv_file_name = f"{company_name.replace(' ', '_').lower()}_{template_name.replace(' ', '_').lower()}_{from_date_str}_to_{to_date_str}_sales_report.csv"
+                    full_file_path = os.path.join(private_path, csv_file_name)
 
-            # Store the file path for reference
-            csv_files[template_name] = f"/files/sales_report_files/{csv_file_name}"
+                    with open(full_file_path, 'w', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+                        # writer.writerow([
+                        #     "PIN of Purchaser",
+                        #     "Name of Purchaser",
+                        #     "ETR Serial Number",
+                        #     "Invoice Date",
+                        #     "Invoice Name",
+                        #     "ETR Invoice Number",
+                        #     "Invoice Total Sales",
+                        #     "CU Invoice Date",
+                        #     "Return Against"
+                        # ])
 
-    # Return the file paths for download
+                        for invoice in sales_invoices:
+                            writer.writerow([
+                                invoice.get('pin_of_purchaser', ''),
+                                invoice.get('name_of_purchaser', ''),
+                                invoice.get('etr_serial_number', ''),
+                                invoice.get('invoice_date', ''),
+                                invoice.get('invoice_name', ''),
+                                f"|{(invoice.get('etr_invoice_number', ''))}",
+                                invoice.get('invoice_total_sales', ''),
+                                invoice.get('cu_invoice_date', ''),
+                                invoice.get('return_against', '')
+                            ])
+                    
+                    file_record = frappe.get_doc({
+                        "doctype": "File",
+                        "file_name": csv_file_name,
+                        "file_url": f"/private/files/sales_report_files/{csv_file_name}",
+                        "attached_to_name": company,
+                        "attached_to_doctype": "Sales Invoice",
+                        "file_size": os.path.getsize(full_file_path),
+                        "is_private": 1,
+                        "file_type": "CSV",
+                    })
+                    file_record.insert()
+
+                    csv_files[company_name] = f"/private/files/sales_report_files/{csv_file_name}"
+
     return csv_files

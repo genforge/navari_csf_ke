@@ -48,8 +48,7 @@ frappe.query_reports["Kenya Sales Tax Report"] = {
 		}
 	],
     "onload": function(report) {
-        report.page.add_action_icon('bi bi-download', function() {
-            // frappe.msgprint(__('This is a custom action!!!'))
+        report.page.add_menu_item('Export CSVs', function() {
             frappe.call({
                 method: "csf_ke.csf_ke.report.kenya_sales_tax_report.kenya_sales_tax_report.download_custom_csv_format",
                 args: {
