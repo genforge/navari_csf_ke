@@ -316,16 +316,25 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                                     invoice.get('return_against', '') if invoice.return_against else '',
                                 ])
                     
-                    file_record = frappe.get_doc({
-                        "doctype": "File",
-                        "file_name": csv_file_name,
-                        "file_url": f"/private/files/sales_report_files/{csv_file_name}",
-                        "attached_to_name": company,
-                        "attached_to_doctype": "Sales Invoice",
-                        "file_size": os.path.getsize(full_file_path),
-                        "is_private": 1,
-                        "file_type": "CSV",
-                    })
+                    # file_record = frappe.get_doc({
+                    #     "doctype": "File",
+                    #     "file_name": csv_file_name,
+                    #     "file_url": f"/private/files/sales_report_files/{csv_file_name}",
+                    #     "attached_to_name": company,
+                    #     "attached_to_doctype": "Sales Invoice",
+                    #     "file_size": os.path.getsize(full_file_path),
+                    #     "is_private": 1,
+                    #     "file_type": "CSV",
+                    # })
+                    # file_record.insert()
+                    file_record = frappe.new_doc("File")
+                    file_record.file_name = csv_file_name
+                    file_record.file_url = f"/private/files/sales_report_files/{csv_file_name}"
+                    file_record.attached_to_name = company
+                    file_record.attached_to_doctype = "Sales Invoice"
+                    file_record.file_size = os.path.getsize(full_file_path)
+                    file_record.is_private = 1
+                    file_record.file_type = "CSV"
                     file_record.insert()
 
                     csv_files[company_name] = f"/private/files/sales_report_files/{csv_file_name}"
