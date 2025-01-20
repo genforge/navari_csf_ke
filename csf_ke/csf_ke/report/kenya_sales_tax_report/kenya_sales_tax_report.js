@@ -65,16 +65,16 @@ frappe.query_reports["Kenya Sales Tax Report"] = {
                         // Display links in a modal
                         frappe.msgprint({
                             title: __('CSV Download Links'),
-                            message: fileLinks.join('<br>'),
+                            message: __('The files have been successfully generated. Redirecting to the File List...'),
                             indicator: 'green'
                         });
+
+                        // Redirect to the File List
+                        frappe.set_route('List', 'File', { 'file_name': ['Like', `sales_report`] });
                     } else {
                         frappe.msgprint(__('No files were generated'));
                     }
                 },
-                error: function() {
-                    frappe.msgprint(__('An error occured while generating the CSV files.'));
-                }
             });
         });
     }
