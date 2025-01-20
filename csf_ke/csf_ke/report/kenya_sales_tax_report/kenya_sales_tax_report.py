@@ -303,7 +303,6 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                         writer = csv.writer(csvfile)
 
                         for invoice in sales_invoices:
-                            print(invoice)
                             if invoice.get('pin_of_purchaser'):
                                 writer.writerow([
                                     invoice.get('pin_of_purchaser', ''),
