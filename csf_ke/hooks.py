@@ -241,3 +241,11 @@ jinja = {
         "csf_ke.csf_ke.utils.qr_code_generator.get_qr_code"
     ]
 }
+
+# include js in doctype views
+doctype_js = {
+    "Delivery Note": "public/js/delivery_note.js",
+    "Sales Invoice": "public/js/sales_invoice.js",
+    "Purchase Invoice": "public/js/purchase_invoice.js",
+    "Purchase Receipt": "public/js/purchase_receipt.js",
+}
