@@ -129,6 +129,10 @@ fixtures = [
 # 	"ToDo": "custom_app.overrides.CustomToDo"
 # }
 
+override_doctype_class = {
+    "File": "csf_ke.csf_ke.doctype.override_doctype.file.File"
+}
+
 # Document Events
 # ---------------
 # Hook on document methods and events
