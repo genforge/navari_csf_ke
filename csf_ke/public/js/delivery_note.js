@@ -13,11 +13,6 @@ frappe.ui.form.on("Delivery Note Item", {
                         frappe.model.set_value(cdt, cdn, "tims_hscode", r.message);
                     } else {
                         frappe.model.set_value(cdt, cdn, "tims_hscode", null);
-                        // frappe.msgprint({
-                        //     title: __("HS Code Missing"),
-                        //     message: __("HS Code is not set for the selected item."),
-                        //     indicator: "orange",
-                        // });
                     }
                 },
             });
