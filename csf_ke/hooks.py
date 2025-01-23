@@ -33,6 +33,10 @@ fixtures = [
                     "Item Tax-custom_tims_hscode",
                     "Item Tax-custom_section_break_k5uid",
                     "Item Tax-custom_description",
+                    "Delivery Note Item-custom_tims_hscode",
+                    "Sales Invoice Item-custom_tims_hscode",
+                    "Purchase Receipt Item-custom_tims_hscode",
+                    "Purchase Invoice Item-custom_tims_hscode"
                 ),
             ]
         ],
@@ -236,4 +240,12 @@ jinja = {
     "methods": [
         "csf_ke.csf_ke.utils.qr_code_generator.get_qr_code"
     ]
+}
+
+# include js in doctype views
+doctype_js = {
+    "Delivery Note": "public/js/delivery_note.js",
+    "Sales Invoice": "public/js/sales_invoice.js",
+    "Purchase Invoice": "public/js/purchase_invoice.js",
+    "Purchase Receipt": "public/js/purchase_receipt.js",
 }
