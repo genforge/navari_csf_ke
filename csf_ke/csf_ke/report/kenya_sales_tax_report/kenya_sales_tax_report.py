@@ -266,7 +266,7 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
     from_date_str = from_date.strftime("%y-%m-%d") if isinstance(from_date, datetime) else from_date
     to_date_str = to_date.strftime("%y-%m-%d") if isinstance(to_date, datetime) else to_date
 
-    private_path = frappe.utils.get_site_path('private', 'files', 'sales_report_files')
+    private_path = frappe.utils.get_site_path('private', 'files')
     os.makedirs(private_path, exist_ok=True)
 
     tax_templates = [
@@ -296,7 +296,7 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                 )
 
                 full_file_path = os.path.join(private_path, csv_file_name)
-                file_url = f"/private/files/sales_report_files/{csv_file_name}"
+                file_url = f"/private/files/{csv_file_name}"
                 
                 sales_invoices = KenyaSalesTaxReport({
                     "company": company,
