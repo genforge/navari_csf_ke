@@ -286,7 +286,16 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
         for template in all_tax_templates:
             match = pattern.match(template['name'])
             if match:
-                company_name = match.group(0)
+                # Sanitize the company and template names for the file name
+                sanitized_company_name = re.sub(r"[^\w]+", "_", company).lower()
+                sanitized_template_name = re.sub(r"[^\w]+", "_", template_name).lower()
+
+                # Generate a valid file name
+                csv_file_name = (
+                    f"{sanitized_template_name}_{sanitized_company_name}_{from_date_str}_to_{to_date_str}_sales_report.csv"
+                )
+
+                full_file_path = os.path.join(private_path, csv_file_name)
                 
                 sales_invoices = KenyaSalesTaxReport({
                     "company": company,
@@ -296,8 +305,6 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                 }).get_data()
 
                 if sales_invoices:
-                    csv_file_name = f"{company_name.replace(' ', '_').lower()}_{template_name.replace(' ', '_').lower()}_{from_date_str}_to_{to_date_str}_sales_report.csv"
-                    full_file_path = os.path.join(private_path, csv_file_name)
 
                     with open(full_file_path, 'w', newline='') as csvfile:
                         writer = csv.writer(csvfile)
@@ -328,6 +335,6 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                     })
                     file_record.insert()
 
-                    csv_files[company_name] = f"/private/files/sales_report_files/{csv_file_name}"
+                    csv_files[sanitized_company_name] = f"/private/files/sales_report_files/{csv_file_name}"
 
     return csv_files
