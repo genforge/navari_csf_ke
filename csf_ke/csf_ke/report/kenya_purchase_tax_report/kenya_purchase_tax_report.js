@@ -70,7 +70,7 @@ frappe.query_reports["Kenya Purchase Tax Report"] = {
                         });
 
                         // Redirect to the File List
-                        frappe.set_route('List', 'File', { 'file_name': ['Like', `purchase_report`] });
+                        frappe.set_route('List', 'File', { 'file_name': ['Like', `purchase`] });
                     } else {
                         frappe.msgprint(__('No files were generated'));
                     }

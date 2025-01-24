@@ -286,8 +286,8 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
     if not to_date:
         frappe.throw(_("To Date is required"))
     
-    from_date_str = from_date.strftime("%Y-%m-%d") if isinstance(from_date, datetime) else from_date
-    to_date_str = to_date.strftime("%Y-%m-%d") if isinstance(to_date, datetime) else to_date
+    from_date_str = from_date.strftime("%y-%m-%d") if isinstance(from_date, datetime) else from_date
+    to_date_str = to_date.strftime("%y-%m-%d") if isinstance(to_date, datetime) else to_date
 
     private_path = frappe.utils.get_site_path('private', 'files', 'purchase_report_files')
     os.makedirs(private_path, exist_ok=True)
@@ -310,15 +310,17 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
             match = pattern.match(template['name'])
             if match:
                 # Sanitize the company and template names for the file name
-                sanitized_company_name = re.sub(r"[^\w]+", "_", company).lower()
+                company_abbr = frappe.db.get_value("Company", company, "abbr") or ""
                 sanitized_template_name = re.sub(r"[^\w]+", "_", template_name).lower()
 
                 # Generate a valid file name
                 csv_file_name = (
-                    f"{sanitized_template_name}_{sanitized_company_name}_{from_date_str}_to_{to_date_str}_purchase_report.csv"
+                    f"purchase_{sanitized_template_name[:5]}_{company_abbr}_{from_date_str}_to_{to_date_str}.csv".strip("_")
                 )
 
                 full_file_path = os.path.join(private_path, csv_file_name)
+                file_url = f"/private/files/purchase_report_files/{csv_file_name}"
+
                 
                 purchase_invoices = KenyaPurchaseTaxReport({
                     "company": company,
@@ -348,7 +350,7 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                     file_record = frappe.get_doc({
                         "doctype": "File",
                         "file_name": csv_file_name,
-                        "file_url": f"/private/files/purchase_report_files/{csv_file_name}",
+                        "file_url": file_url,
                         "attached_to_name": company,
                         "attached_to_doctype": "Purchase Invoice",
                         "file_size": os.path.getsize(full_file_path),
@@ -357,6 +359,6 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                     })
                     file_record.insert()
 
-                    csv_files[sanitized_company_name] = f"/private/files/purchase_report_files/{csv_file_name}"
+                    csv_files[company_abbr] = file_url
 
     return csv_files
