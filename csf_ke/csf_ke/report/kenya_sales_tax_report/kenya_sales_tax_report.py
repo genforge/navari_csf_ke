@@ -140,7 +140,7 @@ class KenyaSalesTaxReport(object):
                     sale_invoice_doc.name.as_('invoice_name'),
                     sale_invoice_doc.base_grand_total.as_('invoice_total_sales'),
                     sale_invoice_doc.return_against.as_('return_against')) \
-            .where(sale_invoice_doc.status != 'Cancelled')
+            .where(sale_invoice_doc.docstatus == 1)
 
         if company:
             sales_invoice_query = sales_invoice_query.where(sale_invoice_doc.company == company)
