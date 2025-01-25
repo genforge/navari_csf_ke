@@ -5,6 +5,10 @@ from __future__ import unicode_literals
 
 import frappe
 from frappe import _
+import csv
+import os
+import re
+from datetime import datetime
 
 
 def execute(filters=None):
@@ -271,3 +275,90 @@ class KenyaPurchaseTaxReport(object):
                 "currency": "KES",
             },
         ]
+
+@frappe.whitelist()
+def download_custom_csv_format(company, from_date=None, to_date=None):
+    
+    if not company:
+        frappe.throw(_("Company is required"))
+    if not from_date:
+        frappe.throw(_("From Date is required"))
+    if not to_date:
+        frappe.throw(_("To Date is required"))
+    
+    from_date_str = from_date.strftime("%y-%m-%d") if isinstance(from_date, datetime) else from_date
+    to_date_str = to_date.strftime("%y-%m-%d") if isinstance(to_date, datetime) else to_date
+
+    private_path = frappe.utils.get_site_path('private', 'files')
+    os.makedirs(private_path, exist_ok=True)
+
+    tax_templates = [
+        "VAT 16%",
+        "Exempt",
+        "Zero-Rated"
+    ]
+    
+    csv_files = {}
+
+    for template_name in tax_templates:
+        
+        pattern = re.compile(rf"{re.escape(template_name)}[\s\-_]*[\d\%]*", re.IGNORECASE)
+
+        all_tax_templates = frappe.get_all('Item Tax Template', fields=['name'])
+
+        for template in all_tax_templates:
+            match = pattern.match(template['name'])
+            if match:
+                # Sanitize the company and template names for the file name
+                company_abbr = frappe.db.get_value("Company", company, "abbr") or ""
+                sanitized_template_name = re.sub(r"[^\w]+", "_", template_name).lower()
+
+                # Generate a valid file name
+                csv_file_name = (
+                    f"purchase_{sanitized_template_name[:5]}_{company_abbr}_{from_date_str}_to_{to_date_str}.csv".strip("_")
+                )
+
+                full_file_path = os.path.join(private_path, csv_file_name)
+                file_url = f"/private/files/{csv_file_name}"
+
+                
+                purchase_invoices = KenyaPurchaseTaxReport({
+                    "company": company,
+                    "from_date": from_date,
+                    "to_date": to_date,
+                    "tax_template": template['name']
+                }).get_data()
+
+                if purchase_invoices:
+
+                    with open(full_file_path, 'w', newline='') as csvfile:
+                        writer = csv.writer(csvfile)
+
+                        for invoice in purchase_invoices:
+                            if invoice.get('pin_of_supplier'):
+                                writer.writerow([
+                                    invoice.get('pin_of_supplier', ''),
+                                    invoice.get('name_of_supplier', ''),
+                                    f"|{(invoice.get('etr_invoice_number', ''))}",
+                                    invoice.get('invoice_date', ''),
+                                    invoice.get('invoice_name', ''),
+                                    invoice.get('taxable_value', ''),
+                                    f"{'|' + invoice.get('return_cu_invoice_number', '') if invoice.return_against else ''}",
+                                    invoice.get('return_cu_invoice_date', '') if invoice.return_against else '',
+                                ])
+                    
+                    file_record = frappe.get_doc({
+                        "doctype": "File",
+                        "file_name": csv_file_name,
+                        "file_url": file_url,
+                        "attached_to_name": company,
+                        "attached_to_doctype": "Purchase Invoice",
+                        "file_size": os.path.getsize(full_file_path),
+                        "is_private": 1,
+                        "file_type": "CSV",
+                    })
+                    file_record.insert()
+
+                    csv_files[company_abbr] = file_url
+
+    return csv_files
