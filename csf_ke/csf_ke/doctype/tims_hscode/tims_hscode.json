@@ -7,6 +7,8 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "disabled",
+  "section_break_hgcv",
   "tims_hscode",
   "item_tax",
   "column_break_vneu",
@@ -58,7 +60,9 @@
    "columns": 2,
    "fieldname": "description",
    "fieldtype": "Small Text",
+   "in_filter": 1,
    "in_list_view": 1,
+   "in_standard_filter": 1,
    "label": "Description",
    "reqd": 1
   },
@@ -72,11 +76,21 @@
    "in_standard_filter": 1,
    "label": "TIMs HSCode",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "disabled",
+   "fieldtype": "Check",
+   "label": "Disabled"
+  },
+  {
+   "fieldname": "section_break_hgcv",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-01-14 07:50:36.021742",
+ "modified": "2025-01-25 12:06:36.159612",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "TIMs HSCode",
