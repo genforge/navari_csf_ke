@@ -8,3 +8,4 @@ csf_ke.csf_ke.patches.job_offer_valid_date
 csf_ke.csf_ke.patches.employee_separation_type
 csf_ke.csf_ke.patches.appointment_letter_introduction
 csf_ke.csf_ke.patches.appointment_letter_template_introduction
+csf_ke.csf_ke.patches.remove_hscode_description

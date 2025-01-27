@@ -31,12 +31,6 @@ fixtures = [
                     "Salary Component-p9a_tax_deduction_card_type",
                     "Item Tax-custom_column_break",
                     "Item Tax-custom_tims_hscode",
-                    "Item Tax-custom_section_break_k5uid",
-                    "Item Tax-custom_description",
-                    "Delivery Note Item-custom_tims_hscode",
-                    "Sales Invoice Item-custom_tims_hscode",
-                    "Purchase Receipt Item-custom_tims_hscode",
-                    "Purchase Invoice Item-custom_tims_hscode"
                 ),
             ]
         ],
