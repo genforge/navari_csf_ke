@@ -22,3 +22,7 @@ frappe.ui.form.on("TIMs HSCode", {
         }
     }
 });
+
+frappe.listview_settings["TIMs HSCode"] = {
+    hide_name_column: true
+}
