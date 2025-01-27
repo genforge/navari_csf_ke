@@ -2,7 +2,7 @@
  "actions": [],
  "allow_import": 1,
  "allow_rename": 1,
- "autoname": "format:{tims_hscode}",
+ "autoname": "field:tims_hscode",
  "creation": "2025-01-09 12:27:31.827636",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -75,7 +75,8 @@
    "in_preview": 1,
    "in_standard_filter": 1,
    "label": "TIMs HSCode",
-   "reqd": 1
+   "reqd": 1,
+   "unique": 1
   },
   {
    "default": "0",
@@ -89,12 +90,21 @@
   }
  ],
  "index_web_pages_for_search": 1,
- "links": [],
- "modified": "2025-01-25 12:06:36.159612",
+ "links": [
+  {
+   "link_doctype": "Item Group",
+   "link_fieldname": "tims_hscode"
+  },
+  {
+   "link_doctype": "Item",
+   "link_fieldname": "tims_hscode"
+  }
+ ],
+ "modified": "2025-01-25 14:32:35.503634",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "TIMs HSCode",
- "naming_rule": "Expression",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
@@ -111,8 +121,10 @@
   }
  ],
  "search_fields": "tims_hscode, item_tax, description",
+ "show_title_field_in_link": 1,
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],
- "title_field": "tims_hscode"
+ "title_field": "tims_hscode",
+ "track_changes": 1
 }
