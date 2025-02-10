@@ -153,6 +153,12 @@ doc_events = {
     "Purchase Invoice": {
         "on_submit": "csf_ke.csf_ke.doctype.api.update_item_price_list.update_item_prices"
     },
+    "Item": {
+        "before_save": "csf_ke.csf_ke.utils.get_tims_hscode.validate_mandatory_hscode"
+    },
+    "Item Group": {
+        "before_save": "csf_ke.csf_ke.utils.get_tims_hscode.validate_mandatory_hscode"
+    }
 }
 # Scheduled Tasks
 # ---------------
@@ -237,9 +243,6 @@ jinja = {
 }
 
 # include js in doctype views
-doctype_js = {
-    "Delivery Note": "public/js/delivery_note.js",
-    "Sales Invoice": "public/js/sales_invoice.js",
-    "Purchase Invoice": "public/js/purchase_invoice.js",
-    "Purchase Receipt": "public/js/purchase_receipt.js",
-}
+# doctype_js = {
+
+# }
