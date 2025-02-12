@@ -47,9 +47,6 @@ fixtures = [
             ]
         ],
     },
-    {
-        "doctype": "TIMs HSCode",
-    },
 ]
 
 # Includes in <head>
@@ -101,6 +98,7 @@ fixtures = [
 
 # before_install = "csf_ke.install.before_install"
 # after_install = "csf_ke.install.after_install"
+after_migrate = "csf_ke.csf_ke.doctype.tims_hscode.tims_hscode.insert_new_records"
 
 # Uninstallation
 # ------------
