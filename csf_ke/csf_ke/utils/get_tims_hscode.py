@@ -1,16 +1,19 @@
 import frappe
+from frappe import _
 
-@frappe.whitelist()
-def get_tims_hscode_for_item(item_code):
+def validate_mandatory_hscode(doc, method):
+    """
+    Validate that the TIMs HSCode field is filled if an Item Tax Template is linked.
+    """
+    for tax in doc.taxes:
+        if tax.item_tax_template:
+            hscodes = frappe.get_all("TIMs HSCode", 
+                                     filters={"item_tax": tax.item_tax_template}, 
+                                     fields=["name", "tims_hscode"])
 
-    item_tims_hscode = frappe.get_all(
-        "Item Tax",
-        filters={"parent": item_code, "parenttype": "Item"},
-        fields=["tims_hscode"],
-        limit_page_length=1,
-    )
+            if hscodes and not tax.tims_hscode:
+                fieldname = "tims_hscode"
+                message = _(
+                    "TIMs HSCode is mandatory for Item Tax Template {0}.").format(frappe.bold(tax.item_tax_template), fieldname)
 
-    if item_tims_hscode and item_tims_hscode[0].get("tims_hscode"):
-        return item_tims_hscode[0]["tims_hscode"]
-    
-    return None 
+                frappe.throw(message, title=_("Missing TIMs HSCode"))
