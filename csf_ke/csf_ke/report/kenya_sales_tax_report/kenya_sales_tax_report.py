@@ -311,17 +311,18 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                         writer = csv.writer(csvfile)
 
                         for invoice in sales_invoices:
-                            if invoice.get('pin_of_purchaser'):
+                            if invoice.get('pin_of_purchaser'):                                
                                 writer.writerow([
                                     invoice.get('pin_of_purchaser', ''),
                                     invoice.get('name_of_purchaser', ''),
                                     invoice.get('etr_serial_number', ''),
-                                    invoice.get('invoice_date', ''),
+                                    invoice.get('invoice_date', '').strftime("%d/%m/%Y"),
                                     f"|{(invoice.get('etr_invoice_number', ''))}",
                                     invoice.get('invoice_name', ''),
                                     invoice.get('invoice_total_sales', ''),
-                                    invoice.get('cu_invoice_date', '') if invoice.return_against else '',
-                                    invoice.get('return_against', '') if invoice.return_against else '',
+                                    '',
+                                    f"|{invoice.get('return_cu_invoice_number', '')}" if invoice.return_against else '',
+                                    invoice.get('return_cu_invoice_date').strftime("%d/%m/%Y") if invoice.return_against and invoice.get('return_cu_invoice_date') else '',
                                 ])
                     
                     file_record = frappe.get_doc({
