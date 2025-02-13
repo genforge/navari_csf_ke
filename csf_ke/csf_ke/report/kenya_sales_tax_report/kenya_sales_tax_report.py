@@ -322,7 +322,7 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                                     invoice.get('invoice_total_sales', ''),
                                     '',
                                     f"|{invoice.get('return_cu_invoice_number', '')}" if invoice.return_against else '',
-                                    invoice.get('cu_invoice_date', '').strftime("%d/%m/%Y") if invoice.return_against else '',
+                                    invoice.get('return_cu_invoice_date').strftime("%d/%m/%Y") if invoice.return_against and invoice.get('return_cu_invoice_date') else '',
                                 ])
                     
                     file_record = frappe.get_doc({
