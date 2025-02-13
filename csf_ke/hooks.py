@@ -72,9 +72,9 @@ fixtures = [
 
 # include js in doctype views
 
-doctype_js = {
-    "Customer": "csf_ke/overrides/customer.js"
-}
+# doctype_js = {
+#     "Customer": "csf_ke/overrides/customer.js"
+# }
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -161,14 +161,14 @@ doc_events = {
     "Item Group": {
         "before_save": "csf_ke.csf_ke.utils.get_tims_hscode.validate_mandatory_hscode"
     },
-    "Customer": {
-        "before_save": "csf_ke.csf_ke.overrides.customer.validate_customer_kra"
-    },
+    # "Customer": {
+    #     "before_save": "csf_ke.csf_ke.overrides.customer.validate_customer_kra"
+    # },
     "Sales Order": {
-        "before_save": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
+        "on_submit": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
     },
     "Sales Invoice": {
-        "before_save": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
+        "on_submit": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
     }
 }
 # Scheduled Tasks
