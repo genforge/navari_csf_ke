@@ -340,11 +340,11 @@ def download_custom_csv_format(company, from_date=None, to_date=None):
                                     invoice.get('pin_of_supplier', ''),
                                     invoice.get('name_of_supplier', ''),
                                     f"|{(invoice.get('etr_invoice_number', ''))}",
-                                    invoice.get('invoice_date', ''),
+                                    invoice.get('invoice_date', '').strftime("%d/%m/%Y"),
                                     invoice.get('invoice_name', ''),
                                     invoice.get('taxable_value', ''),
                                     f"{'|' + invoice.get('return_cu_invoice_number', '') if invoice.return_against else ''}",
-                                    invoice.get('return_cu_invoice_date', '') if invoice.return_against else '',
+                                    invoice.get('return_cu_invoice_date', '').strftime("%d/%m/%Y") if invoice.return_against else '',
                                 ])
                     
                     file_record = frappe.get_doc({
