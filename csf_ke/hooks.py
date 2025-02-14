@@ -31,6 +31,7 @@ fixtures = [
                     "Salary Component-p9a_tax_deduction_card_type",
                     "Item Tax-custom_column_break",
                     "Item Tax-custom_tims_hscode",
+                    "Customer Group-custom_is_kra_pin_mandatory_in"
                 ),
             ]
         ],
@@ -72,9 +73,9 @@ fixtures = [
 
 # include js in doctype views
 
-# doctype_js = {
-#     "Customer": "csf_ke/overrides/customer.js"
-# }
+doctype_js = {
+    "Customer": "csf_ke/overrides/customer.js"
+}
 
 # doctype_list_js = {"doctype" : "public/js/doctype_list.js"}
 # doctype_tree_js = {"doctype" : "public/js/doctype_tree.js"}
@@ -161,14 +162,14 @@ doc_events = {
     "Item Group": {
         "before_save": "csf_ke.csf_ke.utils.get_tims_hscode.validate_mandatory_hscode"
     },
-    # "Customer": {
-    #     "before_save": "csf_ke.csf_ke.overrides.customer.validate_customer_kra"
-    # },
+    "Customer": {
+        "before_save": "csf_ke.csf_ke.overrides.customer.validate_customer_kra"
+    },
     "Sales Order": {
-        "on_submit": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
+        "before_submit": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
     },
     "Sales Invoice": {
-        "on_submit": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
+        "before_submit": "csf_ke.csf_ke.overrides.sales_doc.validate_customer_kra"
     }
 }
 # Scheduled Tasks
