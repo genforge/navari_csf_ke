@@ -10,7 +10,7 @@
  "is_standard": "Yes",
  "letter_head": "Standard",
  "letterhead": null,
- "modified": "2025-02-14 00:33:20.236847",
+ "modified": "2025-02-14 14:37:01.644746",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Salary Register Summary With Monthly Comparison",
@@ -21,22 +21,10 @@
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Employee"
-  },
-  {
    "role": "HR Manager"
   },
   {
    "role": "HR User"
-  },
-  {
-   "role": "Leave Approver"
-  },
-  {
-   "role": "All"
-  },
-  {
-   "role": "Employee Self Service"
   }
  ],
  "timeout": 0
