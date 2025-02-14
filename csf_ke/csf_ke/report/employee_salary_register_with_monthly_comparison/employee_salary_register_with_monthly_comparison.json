@@ -10,7 +10,7 @@
  "is_standard": "Yes",
  "letter_head": "Standard",
  "letterhead": null,
- "modified": "2025-02-13 23:56:19.671150",
+ "modified": "2025-02-14 14:37:28.953822",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "Employee Salary Register With Monthly Comparison",
@@ -21,7 +21,10 @@
  "report_type": "Script Report",
  "roles": [
   {
-   "role": "Accounts Manager"
+   "role": "HR Manager"
+  },
+  {
+   "role": "HR User"
   }
  ],
  "timeout": 0
