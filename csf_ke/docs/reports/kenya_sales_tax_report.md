@@ -24,8 +24,8 @@
 3. View the **detailed tax summary** grouped by tax categories.  
 4. Click **Export CSVs** to generate a tax-compliant CSV file.
 
-![Export Kenya Sales Tax Report](../images/kenya_purchase_tax_report_export.png)
-![Generated Files](../images/generated_purchase_files.png)
+![Export Kenya Sales Tax Report](../images/kenya_sales_tax_report_export.png)
+![Generated Files](../images/generated_sales_files.png)
 
 5. Download and Upload the **CSV files**.  
 
