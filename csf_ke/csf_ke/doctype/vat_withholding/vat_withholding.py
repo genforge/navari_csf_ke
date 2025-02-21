@@ -21,7 +21,10 @@ class VATWithholding(Document):
 	def on_submit(self):
 		if not self.withholding_account:
 			frappe.throw("Please set the withholding account")
-		self.create_journal_entry(self, "on_submit", submit_journal_entry=self.submit_journal_entry)
+		
+		journal_entry = self.create_journal_entry(self, "on_submit", submit_journal_entry=self.submit_journal_entry)
+
+		frappe.db.set_value("VAT Withholding", self.name, "journal_entry", journal_entry)
 
 	@staticmethod
 	def create_journal_entry(doc, method, *args, **kwargs):
@@ -58,3 +61,5 @@ class VATWithholding(Document):
 
 		if kwargs.get("submit_journal_entry"):
 			je.submit()
+		
+		return je.name

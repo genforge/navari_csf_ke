@@ -28,6 +28,8 @@
   "pay_point_name",
   "section_break_weug",
   "vat_withholding_amount",
+  "column_break_xcti",
+  "journal_entry",
   "section_break_brjw",
   "amended_from"
  ],
@@ -170,6 +172,16 @@
    "fieldname": "submit_journal_entry",
    "fieldtype": "Check",
    "label": "Submit Journal Entry"
+  },
+  {
+   "fieldname": "column_break_xcti",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "journal_entry",
+   "fieldtype": "Link",
+   "label": "Journal Entry",
+   "options": "Journal Entry"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -180,7 +192,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-02-21 13:43:33.976624",
+ "modified": "2025-02-21 14:50:08.071401",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "VAT Withholding",
