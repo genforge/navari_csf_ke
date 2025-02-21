@@ -9,6 +9,7 @@
  "field_order": [
   "company",
   "customer",
+  "submit_journal_entry",
   "column_break_ynaf",
   "currency",
   "withholding_account",
@@ -163,6 +164,12 @@
    "in_standard_filter": 1,
    "label": "Invoice No",
    "reqd": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "submit_journal_entry",
+   "fieldtype": "Check",
+   "label": "Submit Journal Entry"
   }
  ],
  "index_web_pages_for_search": 1,
@@ -173,7 +180,7 @@
    "link_fieldname": "cheque_no"
   }
  ],
- "modified": "2025-02-21 12:52:26.385430",
+ "modified": "2025-02-21 13:43:33.976624",
  "modified_by": "Administrator",
  "module": "CSF KE",
  "name": "VAT Withholding",

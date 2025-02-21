@@ -21,10 +21,10 @@ class VATWithholding(Document):
 	def on_submit(self):
 		if not self.withholding_account:
 			frappe.throw("Please set the withholding account")
-		self.create_journal_entry(self, "on_submit")
+		self.create_journal_entry(self, "on_submit", submit_journal_entry=self.submit_journal_entry)
 
 	@staticmethod
-	def create_journal_entry(doc, method):
+	def create_journal_entry(doc, method, *args, **kwargs):
 
 		customer_receivable_account = frappe.get_value("Company", doc.company, "default_receivable_account")
 
@@ -55,6 +55,6 @@ class VATWithholding(Document):
 		})
 
 		je.insert()
-		je.submit()
 
- 
+		if kwargs.get("submit_journal_entry"):
+			je.submit()
