@@ -9,8 +9,8 @@ This application extends ERPNext to support country-specific functionality for K
 
 These reports help businesses comply with payroll regulations and generate required documentation for statutory deductions.
 
-- .[P9A Tax Deduction Card](csf_ke/docs/reports/kenya_p9_tax_report.md) - Summarizes PAYE tax deductions for employees.
-- .[P10 Tax Report](csf_ke/docs/reports/kenya_p10_tax_report.md) - Monthly tax return report for employers.
+- [P9A Tax Deduction Card](csf_ke/docs/reports/kenya_p9_tax_report.md) - Summarizes PAYE tax deductions for employees.
+- [P10 Tax Report](csf_ke/docs/reports/kenya_p10_tax_report.md) - Monthly tax return report for employers.
 - NSSF Report - Contributions report for the National Social Security Fund.
 - NHIF Report - Health insurance contributions report.
 - HELB Report - Student loan repayment deductions report.
@@ -19,24 +19,24 @@ These reports help businesses comply with payroll regulations and generate requi
 
 ### Tax Reports
 
-- .[Sales Tax Report](csf_ke/docs/reports/kenya_sales_tax_report.md)
-- .[Purchase Tax Report](csf_ke/docs/reports/kenya_purchase_tax_report.md)
+- [Sales Tax Report](csf_ke/docs/reports/kenya_sales_tax_report.md)
+- [Purchase Tax Report](csf_ke/docs/reports/kenya_purchase_tax_report.md)
 
 ### Tax Compliance
 
 To meet Kenyan tax regulations, the app includes custom fields and integrations:
- - .[Documentation](csf_ke/docs/features/tims_integration.md)
+ - [Documentation](csf_ke/docs/features/tims_integration.md)
 
 - Custom ETR fields in Sales and Purchase invoices - Captures TIMs invoice details for tax compliance.
 - TIMs HSCode - Links items to Harmonized System codes for proper tax classification.
-- .[VAT Withholding](csf_ke/docs/doctypes/vat_withholding.md) - Easy importation of paid withholding from kra website into ERPNext.
+- [VAT Withholding](csf_ke/docs/doctypes/vat_withholding.md) - Easy importation of paid withholding from kra website into ERPNext.
 
 #### Important Note
-For the TIMs Parser integration we are using a trusted partner. Please contact them for installation details at: .[Cecypo](https://docs.cecypo.tech/s/kb/doc/erpnext-O7U5xeE9DN)
+For the TIMs Parser integration we are using a trusted partner. Please contact them for installation details at: [Cecypo](https://docs.cecypo.tech/s/kb/doc/erpnext-O7U5xeE9DN)
 
 ### Other Features
 
-- .[Selling Item Price Margin](csf_ke/docs/doctypes/selling_item_price_margin.md) - Helps businesses determine profitability on sales items.
+- [Selling Item Price Margin](csf_ke/docs/doctypes/selling_item_price_margin.md) - Helps businesses determine profitability on sales items.
 
 ---
 
