@@ -35,4 +35,4 @@
 
 ## Troubleshooting  
 
-- **Report shows no data?** Ensure purchase invoices exist for the selected **company & date range**.  
+- **Report shows no data?** Ensure sales invoices exist for the selected **company & date range**.  
