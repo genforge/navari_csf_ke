@@ -11,7 +11,7 @@ app_description = (
 )
 app_icon = "drag"
 app_color = "grey"
-app_email = "info@navari.co.ke"
+app_email = "support@navari.co.ke"
 app_license = "GNU General Public License (v3)"
 required_apps = ["frappe/erpnext"]
 
