@@ -11,7 +11,7 @@ app_description = (
 )
 app_icon = "drag"
 app_color = "grey"
-app_email = "info@navari.co.ke"
+app_email = "support@navari.co.ke"
 app_license = "GNU General Public License (v3)"
 required_apps = ["frappe/erpnext"]
 
@@ -31,7 +31,11 @@ fixtures = [
                     "Salary Component-p9a_tax_deduction_card_type",
                     "Item Tax-custom_column_break",
                     "Item Tax-custom_tims_hscode",
-                    "Customer Group-custom_is_kra_pin_mandatory_in"
+                    "Customer Group-custom_is_kra_pin_mandatory_in",
+                    "Company-custom_column_break_tunh2",
+                    "Company-custom_withholding_accounts",
+                    "Company-custom_default_debitors_withholding_account",
+                    "Company-custom_default_creditors_withholding_account",
                 ),
             ]
         ],

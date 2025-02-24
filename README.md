@@ -1,90 +1,64 @@
-# EXPNext Country Specific Functionality for Kenya
+# ERPNext Country Specific Functionality for Kenya
+---
+
+This application extends ERPNext to support country-specific functionality for Kenya. It includes tax compliance features, TIMs integration, localized financial reporting, and enhancements tailored to Kenyan businesses.
 
 ## Includes:
 
 ### Kenya Payroll Reports
 
-- P9A Tax Deduction Card
-- P10 Tax Report
-- NSSF Report
-- NHIF Report
-- HELB Report
-- Bank Payroll Advice Report
-- Payroll Register Report
+These reports help businesses comply with payroll regulations and generate required documentation for statutory deductions.
+
+- [P9A Tax Deduction Card](csf_ke/docs/reports/kenya_p9_tax_report.md) - Summarizes PAYE tax deductions for employees.
+- [P10 Tax Report](csf_ke/docs/reports/kenya_p10_tax_report.md) - Monthly tax return report for employers.
+- NSSF Report - Contributions report for the National Social Security Fund.
+- NHIF Report - Health insurance contributions report.
+- HELB Report - Student loan repayment deductions report.
+- Bank Payroll Advice Report - Generates bank instructions for salary processing.
+- Payroll Register Report - Provides a detailed breakdown of payroll transactions.
 
 ### Tax Reports
 
-- Sales Tax Report
-- Purchase Tax Report
+- [Sales Tax Report](csf_ke/docs/reports/kenya_sales_tax_report.md)
+- [Purchase Tax Report](csf_ke/docs/reports/kenya_purchase_tax_report.md)
+
+### Tax Compliance
+
+To meet Kenyan tax regulations, the app includes custom fields and integrations:
+ - [Documentation](csf_ke/docs/features/tims_integration.md)
+
+- Custom ETR fields in Sales and Purchase invoices - Captures TIMs invoice details for tax compliance.
+- TIMs HSCode - Links items to Harmonized System codes for proper tax classification.
+- [VAT Withholding](csf_ke/docs/doctypes/vat_withholding.md) - Easy importation of paid withholding from kra website into ERPNext.
+
+#### Important Note
+For the TIMs Parser integration we are using a trusted partner. Please contact them for installation details at: [Cecypo](https://docs.cecypo.tech/s/kb/doc/erpnext-O7U5xeE9DN)
+
+### Other Features
+
+- [Selling Item Price Margin](csf_ke/docs/doctypes/selling_item_price_margin.md) - Helps businesses determine profitability on sales items.
 
 ---
 
-## P9A Tax Deduction Card Setup
+## How to Install 🛠️
 
-### Salary Component Mapping for P9A
+### Manual Installation/Self Hosting
 
-This guide explains the process of mapping salary components to the P9A Tax Deduction Card Type in a Frappe-based system. Follow these steps to configure and manage the salary components effectively.
+To install the app, [Setup, Initialise, and run a Frappe Bench instance](https://frappeframework.com/docs/user/en/installation).
 
-### Prerequisites
-
-- A Frappe-based application
-- Access to the Frappe application
-- Basic knowledge of salary components and tax deduction cards
-
-### Step-by-Step Process
-
-#### Access the Frappe Application
-
-1. **Log into your Frappe instance with your credentials.**
-
-#### Navigate to Salary Component DocType
-
-2. **Go to the DocType list and search for "Salary Component".**
-3. **Click on "Salary Component" to view and manage the components.**
-  ![image](https://github.com/navariltd/navari_csf_ke/assets/99787384/5a45a003-6566-481b-8c86-6beee8c7577d)
-
-
-#### Create New Salary Components
-
-4. **Create a new salary component in the Frappe system.**
-5. **Click on "Add Salary Component " to add a new component.**
-  <img width="958" alt="Capture 256" src="https://github.com/navariltd/navari_csf_ke/assets/99787384/73299625-9ce4-4d87-89f6-c6398b7d8ec8">
-
-   
-#### Fill in the Salary Component Details
-
-6. **Component Name**: Fill in the component name.
-7. **Type**: Choose whether it's an earning or deduction (based on your payroll structure).
-8. **P9A Tax Deduction Card Type**: Set this field using the value from the "P9A Tax Deduction Card Type" column.
-   ![Component Details](image-1.png)
-
-#### Configure Additional Fields
-
-9. Set other fields like "Do Not Include in Total", "Exempted from Income Tax", "Is Income Tax Component", etc., based on your organizational requirements and the data provided.
-   ![Additional Fields](image-3.png)
-
-#### Save the Component
-
-10. Once all relevant fields are filled, **save the new salary component**.
-11. Repeat the process for each component.
-
-#### Verify the Components
-
-12. After all components are created, verify that they are correctly mapped and appear as expected in the payroll process.
-13. Test the payroll calculations to ensure the formulas are working correctly and the tax deductions are being applied as per the P9A card types.
-    ![Verify Components](image-4.png)
-
-### Notes
-
-- Ensure that the formulas are correctly adapted to your Frappe system’s syntax.
-- Double-check the P9A tax deduction card types to ensure compliance with your local tax regulations.
-- Update the system documentation to reflect any changes made during this process.
-
-## Installation
-
-Using bench, [install ERPNext](https://github.com/frappe/bench#installation) as mentioned here.
-
-Once ERPNext is installed, add CSF_KE app to your bench by running:
+Once the instance is up and running, add the application to the environment by running the command below in an active Bench terminal:
 
 ```sh
-$ bench get-app https://github.com/navariltd/CSF_KE.git
+bench get-app https://github.com/navariltd/navari_csf_ke.git
+```
+
+followed by:
+
+```sh
+bench --site <your.site.name.here> install-app csf_ke
+```
+
+
+### FrappeCloud Installation ☁️
+
+Installing on [FrappeCloud](https://frappecloud.com/docs/introduction) can be achieved after setting up a Bench instance and a site. The app can then be added using the _Add App_ button in the _App_ tab of the bench and referencing this repository by using the _Install from GitHub_ option if you are not able to search for the app.
